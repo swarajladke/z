@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { X, Heart, ShoppingBag, Check, FileCheck, Layers } from "lucide-react";
 import { useQuickPreview } from "@/context/QuickPreviewContext";
@@ -15,6 +15,21 @@ export const QuickPreviewModal: React.FC = () => {
   const { toggleWishlist, isInWishlist } = useWishlist();
   const [selectedLicense, setSelectedLicense] = useState<LicenseType>("commercial");
 
+  // Lock body scroll and handle Escape key while modal is open
+  useEffect(() => {
+    if (previewProduct) {
+      document.body.style.overflow = "hidden";
+      const handleKeyDown = (e: KeyboardEvent) => {
+        if (e.key === "Escape") closeQuickPreview();
+      };
+      window.addEventListener("keydown", handleKeyDown);
+      return () => {
+        document.body.style.overflow = "unset";
+        window.removeEventListener("keydown", handleKeyDown);
+      };
+    }
+  }, [previewProduct, closeQuickPreview]);
+
   if (!previewProduct) return null;
 
   const basePaise = previewProduct.priceInPaise ?? Math.round(previewProduct.price * 100);
@@ -27,7 +42,10 @@ export const QuickPreviewModal: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+    <div
+      onClick={closeQuickPreview}
+      className="fixed inset-0 z-50 bg-slate-950/70 backdrop-blur-xs flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200"
+    >
       <div
         className="bg-white rounded-2xl w-full max-w-4xl max-h-[90vh] overflow-hidden shadow-2xl border border-slate-200 flex flex-col md:flex-row relative"
         onClick={(e) => e.stopPropagation()}
@@ -43,7 +61,7 @@ export const QuickPreviewModal: React.FC = () => {
 
         {/* Left: Product Media Preview */}
         <div className="md:w-1/2 bg-slate-950 p-6 flex flex-col justify-between relative overflow-hidden">
-          <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+          <div className="relative aspect-[4/5] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
             <img
               src={previewProduct.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
               alt={previewProduct.title}
@@ -54,13 +72,13 @@ export const QuickPreviewModal: React.FC = () => {
             />
             {/* Watermark overlay placeholder */}
             <div className="absolute inset-0 flex items-center justify-center pointer-events-none opacity-20">
-              <span className="text-4xl font-extrabold text-white tracking-widest rotate-[-25deg] select-none">
+              <span className="text-3xl font-black text-white tracking-widest rotate-[-25deg] select-none">
                 KALASTOCK PREVIEW
               </span>
             </div>
           </div>
 
-          <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          <div className="mt-4 flex gap-2 overflow-x-auto pb-1 scrollbar-none">
             {(previewProduct.galleryImages || []).map((img, idx) => (
               <img
                 key={idx}
@@ -74,9 +92,9 @@ export const QuickPreviewModal: React.FC = () => {
             ))}
           </div>
 
-          <div className="mt-4 text-[11px] text-slate-400 flex items-center gap-3">
-            <span className="flex items-center gap-1">
-              <FileCheck className="w-3.5 h-3.5 text-cyan-400" />
+          <div className="mt-4 text-xs text-slate-400 flex items-center gap-3">
+            <span className="flex items-center gap-1 font-semibold text-cyan-300">
+              <FileCheck className="w-3.5 h-3.5" />
               {previewProduct.fileFormats.join(", ")}
             </span>
             <span>•</span>
@@ -91,48 +109,48 @@ export const QuickPreviewModal: React.FC = () => {
         <div className="md:w-1/2 p-6 flex flex-col justify-between overflow-y-auto max-h-[80vh] md:max-h-[none]">
           <div>
             <div className="flex items-center justify-between gap-2 mb-2">
-              <span className="text-xs font-bold uppercase tracking-wider text-violet-700 bg-violet-50 px-2.5 py-0.5 rounded-full">
+              <span className="text-xs font-extrabold uppercase tracking-wider text-[#6D28D9] bg-violet-50 px-2.5 py-0.5 rounded-full border border-violet-100">
                 {previewProduct.category}
               </span>
-              <span className="text-xs text-slate-500 font-medium">
+              <span className="text-xs text-slate-500 font-semibold">
                 ★ {previewProduct.ratingPlaceholder} rating
               </span>
             </div>
 
-            <h2 className="text-xl font-bold text-slate-900 leading-snug">
+            <h2 className="text-xl font-extrabold text-[#171717] leading-snug">
               {previewProduct.title}
             </h2>
 
-            <p className="text-slate-600 text-xs mt-2 line-clamp-3">
+            <p className="text-slate-600 text-xs mt-2 leading-relaxed line-clamp-3">
               {previewProduct.description}
             </p>
 
             {/* License Selector */}
             <div className="mt-5 space-y-2">
-              <label className="text-xs font-bold text-slate-900 block">
-                Select License Type:
+              <label className="text-xs font-extrabold text-slate-900 uppercase tracking-wider block">
+                Select License Usage:
               </label>
               <div className="grid grid-cols-2 gap-2">
                 {[
                   { id: "personal", name: "Personal Use", desc: "Individual projects & social" },
-                  { id: "commercial", name: "Commercial Use", desc: "Client work, ads & business" },
+                  { id: "commercial", name: "Commercial Use", desc: "Client work, agency & ads" },
                 ].map((lic) => (
                   <button
                     key={lic.id}
                     onClick={() => setSelectedLicense(lic.id as LicenseType)}
                     className={`p-3 rounded-xl text-left border transition-all ${
                       selectedLicense === lic.id
-                        ? "border-violet-600 bg-violet-50/70 text-slate-900 shadow-xs"
+                        ? "border-[#6D28D9] bg-violet-50/80 text-slate-900 ring-2 ring-violet-600/20"
                         : "border-slate-200 hover:border-slate-300 text-slate-600"
                     }`}
                   >
-                    <div className="text-xs font-bold flex items-center justify-between">
+                    <div className="text-xs font-extrabold text-[#171717] flex items-center justify-between">
                       <span>{lic.name}</span>
                       {selectedLicense === lic.id && (
-                        <Check className="w-3.5 h-3.5 text-violet-600" />
+                        <Check className="w-3.5 h-3.5 text-[#6D28D9]" />
                       )}
                     </div>
-                    <div className="text-[10px] text-slate-500 mt-0.5">{lic.desc}</div>
+                    <div className="text-[11px] text-slate-500 mt-0.5">{lic.desc}</div>
                   </button>
                 ))}
               </div>
@@ -140,15 +158,15 @@ export const QuickPreviewModal: React.FC = () => {
 
             {/* Price Box */}
             <div className="mt-5 flex items-baseline gap-2">
-              <span className="text-2xl font-extrabold text-slate-900">
+              <span className="text-2xl font-black text-[#171717]">
                 {previewProduct.isFree ? (
-                  <span className="text-emerald-600">FREE</span>
+                  <span className="text-[#10B981]">FREE</span>
                 ) : (
                   formatPaiseToINR(currentPaise)
                 )}
               </span>
               {previewProduct.originalPriceInPaise && !previewProduct.isFree && (
-                <span className="text-sm text-slate-400 line-through">
+                <span className="text-sm text-slate-400 line-through font-medium">
                   {formatPaiseToINR(previewProduct.originalPriceInPaise)}
                 </span>
               )}
@@ -160,7 +178,7 @@ export const QuickPreviewModal: React.FC = () => {
             <div className="flex gap-2">
               <button
                 onClick={handleAddToCart}
-                className="flex-1 bg-violet-700 hover:bg-violet-800 text-white font-bold text-sm py-3 rounded-xl transition-colors shadow-md shadow-violet-200 flex items-center justify-center gap-2"
+                className="flex-1 bg-[#6D28D9] hover:bg-[#5B21B6] text-white font-extrabold text-xs py-3 rounded-xl transition-all shadow-md flex items-center justify-center gap-2"
               >
                 <ShoppingBag className="w-4 h-4" />
                 {previewProduct.isFree ? "Download Free Asset" : "Add to Cart"}
@@ -181,7 +199,7 @@ export const QuickPreviewModal: React.FC = () => {
             <Link
               href={`/product/${previewProduct.slug}`}
               onClick={closeQuickPreview}
-              className="block text-center text-xs font-semibold text-violet-700 hover:underline"
+              className="block text-center text-xs font-bold text-[#6D28D9] hover:underline"
             >
               View Full Product Details & File Specs →
             </Link>

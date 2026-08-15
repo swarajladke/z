@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Heart, Eye, ShoppingBag } from "lucide-react";
+import { Heart, Eye, ShoppingBag, Download } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { Product } from "@/types";
 import { useCart } from "@/context/CartContext";
@@ -12,125 +12,176 @@ import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 interface ProductCardProps {
   product: Product;
+  className?: string;
+  isFeatured?: boolean;
 }
 
-export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
+export const ProductCard: React.FC<ProductCardProps> = ({
+  product,
+  className = "",
+  isFeatured = false,
+}) => {
   const shouldReduceMotion = useReducedMotion();
   const { addToCart } = useCart();
   const { toggleWishlist, isInWishlist } = useWishlist();
   const { openQuickPreview } = useQuickPreview();
 
+  const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isWishlistAnimating, setIsWishlistAnimating] = useState(false);
 
   const inWishlist = isInWishlist(product.id);
   const pricePaise = product.priceInPaise ?? Math.round(product.price * 100);
 
-  // Single Primary Badge Resolution (Free > New > Best Seller > Bundle)
+  // Enforce strictly ONE status badge following priority: Free > New > Best Seller > Bundle
   const getPrimaryBadge = () => {
-    if (product.isFree) return { label: "FREE DOWNLOAD", type: "free" };
-    if (product.isNew) return { label: "NEW RELEASE", type: "new" };
-    if (product.isBestSeller) return { label: "BEST SELLER", type: "bestseller" };
-    if (product.isBundle) return { label: `${product.itemCount || "250+"} ASSETS BUNDLE`, type: "bundle" };
+    if (product.isFree) return { label: "FREE", colorClass: "bg-[#10B981] text-white" };
+    if (product.isNew) return { label: "NEW", colorClass: "bg-[#6D28D9] text-white" };
+    if (product.isBestSeller) return { label: "BEST SELLER", colorClass: "bg-[#F59E0B] text-slate-950" };
+    if (product.isBundle) return { label: `${product.itemCount || "BUNDLE"}`, colorClass: "bg-[#06B6D4] text-slate-950" };
     return null;
   };
 
   const badge = getPrimaryBadge();
+
+  // Compact inline format string (e.g. "PSD · Canva")
+  const formatString = product.fileFormats && product.fileFormats.length > 0
+    ? product.fileFormats.slice(0, 2).join(" · ")
+    : "PSD · Canva";
+
+  const handleWishlistClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    toggleWishlist(product.id);
+    setIsWishlistAnimating(true);
+    setTimeout(() => setIsWishlistAnimating(false), 300);
+  };
+
+  const handleQuickPreviewClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    openQuickPreview(product);
+  };
+
+  const handleAddToCartClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    addToCart(product, "commercial");
+  };
 
   return (
     <motion.div
       initial={shouldReduceMotion ? false : { opacity: 0, y: 12 }}
       whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ duration: 0.35 }}
-      className="group relative flex flex-col justify-between bg-white rounded-2xl border border-[rgba(23,23,23,0.12)] overflow-hidden shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-300"
+      transition={{ duration: 0.25 }}
+      className={`group relative flex flex-col justify-between bg-white rounded-xl border border-[rgba(23,23,23,0.12)] overflow-hidden shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 ${
+        isFeatured ? "col-span-2 row-span-2" : ""
+      } ${className}`}
     >
-      {/* Top Artwork Image Container */}
-      <div className="relative aspect-[4/3] w-full overflow-hidden bg-slate-900">
+      {/* Edge-to-Edge 4:5 Portrait Ratio Image Container */}
+      <div className="relative aspect-[4/5] w-full overflow-hidden bg-slate-100">
+        
+        {/* Blur Skeleton Placeholder while image loads */}
+        {!imageLoaded && !imageError && (
+          <div className="absolute inset-0 bg-slate-200 animate-pulse" />
+        )}
+
         <img
           src={imageError ? FALLBACK_IMAGE_DATA_URL : product.thumbnailUrl}
           alt={product.title}
+          onLoad={() => setImageLoaded(true)}
           onError={() => setImageError(true)}
-          className="w-full h-full object-cover group-hover:scale-[1.025] transition-transform duration-500"
+          className={`w-full h-full object-cover group-hover:scale-[1.025] transition-transform duration-200 ${
+            imageLoaded ? "opacity-100" : "opacity-0"
+          }`}
         />
 
-        {/* Strictly 1 Primary Badge inside Image Container */}
+        {/* 1. Status Badge Top-Left (Inset 8-10px) */}
         {badge && (
-          <div className="absolute top-3 left-3 z-10">
+          <div className="absolute top-2.5 left-2.5 z-10">
             <span
-              className={`text-xs font-extrabold px-2.5 py-1 rounded-md shadow-xs uppercase tracking-wider ${
-                badge.type === "free"
-                  ? "bg-emerald-600 text-white"
-                  : badge.type === "new"
-                  ? "bg-cyan-500 text-slate-950"
-                  : badge.type === "bestseller"
-                  ? "bg-[#6D28D9] text-white"
-                  : "bg-[#171717] text-amber-300"
-              }`}
+              className={`text-[11px] font-extrabold px-2 py-0.5 rounded-md shadow-xs uppercase tracking-wider ${badge.colorClass}`}
             >
               {badge.label}
             </span>
           </div>
         )}
 
-        {/* Top-Right Wishlist Button */}
+        {/* 2. Wishlist Circular Action Top-Right */}
         <button
-          onClick={(e) => {
-            e.preventDefault();
-            toggleWishlist(product.id);
-          }}
-          aria-label="Save to wishlist"
-          className={`absolute top-3 right-3 z-10 p-2 rounded-full backdrop-blur-md transition-all ${
+          onClick={handleWishlistClick}
+          aria-label={inWishlist ? "Remove from wishlist" : "Add to wishlist"}
+          className={`absolute top-2.5 right-2.5 z-10 w-8 h-8 rounded-full flex items-center justify-center backdrop-blur-xs transition-all ${
             inWishlist
-              ? "bg-rose-500 text-white"
-              : "bg-slate-900/60 text-white hover:bg-rose-600 opacity-90 sm:opacity-0 sm:group-hover:opacity-100"
-          }`}
+              ? "bg-[#6D28D9] text-white shadow-md"
+              : "bg-slate-900/60 text-white hover:bg-rose-600 hover:text-white"
+          } ${isWishlistAnimating ? "scale-125" : "scale-100"}`}
         >
           <Heart className={`w-4 h-4 ${inWishlist ? "fill-current" : ""}`} />
         </button>
 
-        {/* Quick Preview Slide-Up Overlay on Hover */}
-        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-950/80 via-slate-950/40 to-transparent flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+        {/* 3. Desktop Hover Action Overlay inside Image */}
+        <div className="absolute inset-x-0 bottom-0 p-3 bg-gradient-to-t from-slate-950/85 via-slate-950/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center gap-2 z-10">
           <button
-            onClick={() => openQuickPreview(product)}
-            className="bg-white/90 hover:bg-white text-slate-900 text-xs font-extrabold px-4 py-2 rounded-xl backdrop-blur-xs transition-colors flex items-center gap-1.5 shadow-md hover:-translate-y-[1px]"
+            onClick={handleQuickPreviewClick}
+            className="flex-1 bg-white/90 hover:bg-white text-slate-900 text-xs font-extrabold py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm"
           >
-            <Eye className="w-3.5 h-3.5 text-violet-700" />
-            <span>Quick Preview</span>
+            <Eye className="w-3.5 h-3.5 text-[#6D28D9]" />
+            <span>Preview</span>
+          </button>
+          <button
+            onClick={handleAddToCartClick}
+            className={`flex-1 text-xs font-extrabold py-2 px-3 rounded-lg transition-colors flex items-center justify-center gap-1 shadow-sm ${
+              product.isFree
+                ? "bg-[#10B981] hover:bg-emerald-600 text-white"
+                : "bg-[#6D28D9] hover:bg-violet-600 text-white"
+            }`}
+          >
+            {product.isFree ? (
+              <>
+                <Download className="w-3.5 h-3.5" />
+                <span>Download</span>
+              </>
+            ) : (
+              <>
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>Add</span>
+              </>
+            )}
           </button>
         </div>
       </div>
 
-      {/* Card Body Content */}
-      <div className="p-4 space-y-3 flex-1 flex flex-col justify-between">
-        <div className="space-y-1.5">
-          {/* Category & Asset Type */}
-          <div className="flex items-center justify-between text-xs text-[#6F6A63] font-semibold">
-            <span className="truncate max-w-[140px]">{product.category}</span>
-            <span className="uppercase text-[11px] font-bold text-slate-400 bg-slate-100 px-2 py-0.5 rounded">
-              {product.assetType}
-            </span>
+      {/* Product Metadata Area Below Preview */}
+      <div className="p-3 sm:p-3.5 space-y-1.5 flex-1 flex flex-col justify-between">
+        <div className="space-y-1">
+          {/* Category & Format Text */}
+          <div className="flex items-center justify-between text-xs text-[#6F6A63] font-medium">
+            <span className="truncate max-w-[120px]">{product.category}</span>
+            <span className="text-[11px] font-bold text-slate-400">{formatString}</span>
           </div>
 
-          {/* Product Title (Truncated 2 lines without overlap) */}
+          {/* Product Title (Max 2 lines, never overlapping preview) */}
           <Link href={`/product/${product.slug}`} className="block group-hover:text-[#6D28D9] transition-colors">
-            <h3 className="font-extrabold text-[#171717] text-sm leading-snug line-clamp-2 min-h-[2.5rem]">
+            <h3 className="font-extrabold text-[#171717] text-xs sm:text-sm leading-snug line-clamp-2 min-h-[2.25rem]">
               {product.title}
             </h3>
           </Link>
         </div>
 
-        {/* Pricing & Add to Cart Action */}
-        <div className="pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+        {/* Pricing & Mobile Quick Action */}
+        <div className="pt-2 border-t border-slate-100 flex items-center justify-between gap-1 mt-auto">
           <div>
             {product.isFree ? (
-              <span className="text-sm font-black text-emerald-600">FREE</span>
+              <span className="text-xs sm:text-sm font-black text-[#10B981]">FREE</span>
             ) : (
               <div className="flex items-baseline gap-1.5">
-                <span className="text-sm font-black text-[#171717]">
+                <span className="text-xs sm:text-sm font-black text-[#171717]">
                   {formatPaiseToINR(pricePaise)}
                 </span>
-                {product.originalPriceInPaise && (
-                  <span className="text-xs text-slate-400 line-through font-medium">
+                {product.originalPriceInPaise && product.originalPriceInPaise > pricePaise && (
+                  <span className="text-[11px] text-slate-400 line-through font-medium">
                     {formatPaiseToINR(product.originalPriceInPaise)}
                   </span>
                 )}
@@ -138,16 +189,13 @@ export const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             )}
           </div>
 
+          {/* Mobile Cart Action (Min 44px touch target area) */}
           <button
-            onClick={() => addToCart(product, "commercial")}
-            className={`p-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1 shrink-0 ${
-              product.isFree
-                ? "bg-emerald-50 text-emerald-700 hover:bg-emerald-600 hover:text-white"
-                : "bg-violet-50 text-[#6D28D9] hover:bg-[#6D28D9] hover:text-white"
-            }`}
+            onClick={handleAddToCartClick}
+            aria-label={product.isFree ? "Download asset" : "Add asset to cart"}
+            className="sm:hidden min-w-[44px] min-h-[44px] flex items-center justify-center p-2 text-[#6D28D9] hover:bg-violet-50 rounded-lg"
           >
-            <ShoppingBag className="w-4 h-4" />
-            <span className="hidden sm:inline">Add</span>
+            {product.isFree ? <Download className="w-5 h-5 text-[#10B981]" /> : <ShoppingBag className="w-5 h-5" />}
           </button>
         </div>
       </div>

@@ -2,19 +2,28 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight } from "lucide-react";
+import { ArrowRight, Sparkles } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { MOCK_COLLECTIONS } from "@/data/mock-collections";
+import { MOCK_PRODUCTS } from "@/data/mock-products";
 import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export const CuratedCollections: React.FC = () => {
   const shouldReduceMotion = useReducedMotion();
 
-  const festiveCol = MOCK_COLLECTIONS.find((c) => c.id === "col-festive") || MOCK_COLLECTIONS[0];
-  const socialCol = MOCK_COLLECTIONS.find((c) => c.id === "col-social") || MOCK_COLLECTIONS[1];
-  const businessCol = MOCK_COLLECTIONS.find((c) => c.id === "col-business") || MOCK_COLLECTIONS[2];
-  const weddingCol = MOCK_COLLECTIONS.find((c) => c.id === "col-wedding") || MOCK_COLLECTIONS[3];
-  const foodCol = MOCK_COLLECTIONS.find((c) => c.id === "col-food") || MOCK_COLLECTIONS[4];
+  // Helper to retrieve supporting previews from matching products
+  const getCollectionArtwork = (colSlug: string, fallbackThumb: string) => {
+    const matchingProducts = MOCK_PRODUCTS.filter(
+      (p) => p.category.toLowerCase().includes(colSlug.toLowerCase()) || p.tags.some((t) => t.toLowerCase().includes(colSlug.toLowerCase()))
+    );
+    const images = matchingProducts.map((p) => p.thumbnailUrl);
+    return {
+      main: images[0] || fallbackThumb,
+      sub1: images[1] || MOCK_PRODUCTS[1]?.thumbnailUrl || fallbackThumb,
+      sub2: images[2] || MOCK_PRODUCTS[2]?.thumbnailUrl || fallbackThumb,
+      sub3: images[3] || MOCK_PRODUCTS[3]?.thumbnailUrl || fallbackThumb,
+    };
+  };
 
   return (
     <section className="py-20 bg-[#F5F2EC] border-b border-[rgba(23,23,23,0.12)] text-[#171717]">
@@ -39,205 +48,94 @@ export const CuratedCollections: React.FC = () => {
           </Link>
         </div>
 
-        {/* Asymmetric Editorial Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          
-          {/* 1. Large Feature Card: Festive India (Spans 8 cols on desktop) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4 }}
-            className="md:col-span-8 bg-[#171717] text-white rounded-3xl overflow-hidden border border-slate-800 shadow-2xl relative group flex flex-col justify-between p-8 sm:p-10 min-h-[380px]"
-          >
-            {/* Background Image with Dark Gradient Vignette */}
-            <div className="absolute inset-0 z-0 opacity-40 group-hover:scale-105 transition-transform duration-700">
-              <img
-                src={festiveCol.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                alt={festiveCol.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
-                }}
-                className="w-full h-full object-cover"
-              />
-            </div>
-            <div className="absolute inset-0 bg-gradient-to-t from-[#171717] via-[#171717]/60 to-transparent z-0" />
+        {/* 6 Collage Collection Cards Grid */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {MOCK_COLLECTIONS.map((col) => {
+            const artwork = getCollectionArtwork(col.slug, col.thumbnailUrl);
 
-            {/* Top Badge */}
-            <div className="relative z-10 flex items-center justify-between">
-              <span className="bg-[#6D28D9] text-white text-xs font-extrabold uppercase px-3 py-1 rounded-full tracking-wider">
-                FEATURED COLLECTION
-              </span>
-              <span className="text-xs font-bold text-cyan-300 bg-slate-900/80 backdrop-blur-xs px-3 py-1 rounded-full border border-slate-800">
-                {festiveCol.assetCount}+ Assets Included
-              </span>
-            </div>
+            return (
+              <motion.div
+                key={col.id}
+                initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
+                whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.35 }}
+                className="group bg-white rounded-2xl border border-[rgba(23,23,23,0.12)] p-3.5 shadow-2xs hover:shadow-xl hover:-translate-y-1 transition-all duration-200 flex flex-col justify-between"
+              >
+                <div>
+                  {/* Collage Header: Single Optional Trending Badge */}
+                  <div className="flex items-center justify-between gap-2 mb-2.5">
+                    {col.isTrending ? (
+                      <span className="bg-[#6D28D9] text-white text-[11px] font-extrabold px-2.5 py-0.5 rounded-md uppercase tracking-wider flex items-center gap-1">
+                        <Sparkles className="w-3 h-3" /> TRENDING
+                      </span>
+                    ) : (
+                      <span className="text-xs font-bold text-slate-400 uppercase tracking-wider">
+                        COLLECTION
+                      </span>
+                    )}
+                    <span className="text-xs font-extrabold text-[#6D28D9] bg-violet-50 px-2.5 py-0.5 rounded-full border border-violet-100">
+                      {col.assetCount}+ Assets
+                    </span>
+                  </div>
 
-            {/* Bottom Content */}
-            <div className="relative z-10 space-y-4 max-w-lg mt-12">
-              <h3 className="text-3xl sm:text-4xl font-black text-white leading-tight">
-                {festiveCol.title}
-              </h3>
-              <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-normal">
-                {festiveCol.description}
-              </p>
+                  {/* 4-Image Collage Container (~65% Main + 3 Sub-thumbnails below) */}
+                  <div className="space-y-1.5 overflow-hidden rounded-xl bg-slate-100 p-1.5">
+                    {/* Main Primary Image (~65% height) */}
+                    <div className="relative aspect-[16/9] w-full rounded-lg overflow-hidden bg-slate-900">
+                      <img
+                        src={artwork.main}
+                        alt={col.title}
+                        onError={(e) => {
+                          (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                        }}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
 
-              <div className="pt-2 flex items-center justify-between">
-                <span className="text-xs text-slate-400 font-semibold">
-                  From {formatPaiseToINR(festiveCol.startingPriceInPaise || 34900)}
-                </span>
-                <Link
-                  href={`/assets?category=Festival+Designs`}
-                  className="bg-white text-[#171717] hover:bg-cyan-300 font-bold text-xs px-5 py-2.5 rounded-xl transition-all shadow-md flex items-center gap-1.5 hover:-translate-y-[1px] group/btn"
-                >
-                  <span>Explore Vault</span>
-                  <ArrowRight className="w-4 h-4 group-hover/btn:translate-x-[3px] transition-transform" />
-                </Link>
-              </div>
-            </div>
-          </motion.div>
+                    {/* 3 Supporting Thumbnails in 1 Row */}
+                    <div className="grid grid-cols-3 gap-1.5">
+                      {[artwork.sub1, artwork.sub2, artwork.sub3].map((img, idx) => (
+                        <div key={idx} className="aspect-[4/3] rounded-md overflow-hidden bg-slate-200">
+                          <img
+                            src={img}
+                            alt={`${col.title} preview ${idx + 1}`}
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                            }}
+                            className="w-full h-full object-cover"
+                          />
+                        </div>
+                      ))}
+                    </div>
+                  </div>
 
-          {/* 2. Medium Card 1: Social Media Essentials (Spans 4 cols) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.1 }}
-            className="md:col-span-4 bg-white rounded-3xl p-6 border border-[rgba(23,23,23,0.12)] shadow-xs flex flex-col justify-between group min-h-[380px]"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-extrabold text-[#6D28D9] uppercase tracking-wider block">
-                CREATOR ESSENTIALS
-              </span>
-              <h3 className="text-xl font-extrabold text-[#171717]">{socialCol.title}</h3>
-              <p className="text-xs text-[#6F6A63] leading-relaxed">{socialCol.description}</p>
-            </div>
+                  {/* Collection Title & Price Metadata */}
+                  <div className="mt-3.5 space-y-1">
+                    <h3 className="font-extrabold text-[#171717] text-base group-hover:text-[#6D28D9] transition-colors">
+                      {col.title}
+                    </h3>
+                    <div className="text-xs text-[#6F6A63] font-medium flex items-center justify-between">
+                      <span>Starting from {formatPaiseToINR(col.startingPriceInPaise || 19900)}</span>
+                    </div>
+                  </div>
+                </div>
 
-            <div className="my-4 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-              <img
-                src={socialCol.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                alt={socialCol.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
-                }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-              <span className="text-xs text-[#6F6A63] font-medium">{socialCol.assetCount}+ Templates</span>
-              <Link href={`/assets?category=Social+Media`} className="text-xs font-bold text-[#6D28D9] hover:underline">
-                View Assets →
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* 3. Medium Card 2: Modern Business (Spans 4 cols) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.15 }}
-            className="md:col-span-4 bg-white rounded-3xl p-6 border border-[rgba(23,23,23,0.12)] shadow-xs flex flex-col justify-between group min-h-[340px]"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-extrabold text-[#06B6D4] uppercase tracking-wider block">
-                CORPORATE & STARTUPS
-              </span>
-              <h3 className="text-xl font-extrabold text-[#171717]">{businessCol.title}</h3>
-              <p className="text-xs text-[#6F6A63] leading-relaxed">{businessCol.description}</p>
-            </div>
-
-            <div className="my-4 aspect-[16/9] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-              <img
-                src={businessCol.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                alt={businessCol.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
-                }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-              <span className="text-xs text-[#6F6A63] font-medium">{businessCol.assetCount}+ Decks</span>
-              <Link href={`/assets?category=Business`} className="text-xs font-bold text-[#6D28D9] hover:underline">
-                Explore Business Kits →
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* 4. Small Card: Wedding Season (Spans 4 cols) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.2 }}
-            className="md:col-span-4 bg-white rounded-3xl p-6 border border-[rgba(23,23,23,0.12)] shadow-xs flex flex-col justify-between group min-h-[340px]"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-extrabold text-[#6D28D9] uppercase tracking-wider block">
-                ROYAL CELEBRATIONS
-              </span>
-              <h3 className="text-xl font-extrabold text-[#171717]">{weddingCol.title}</h3>
-              <p className="text-xs text-[#6F6A63] leading-relaxed">{weddingCol.description}</p>
-            </div>
-
-            <div className="my-4 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-              <img
-                src={weddingCol.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                alt={weddingCol.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
-                }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-              <span className="text-xs text-[#6F6A63] font-medium">{weddingCol.assetCount}+ Cards</span>
-              <Link href={`/assets?category=Wedding`} className="text-xs font-bold text-[#6D28D9] hover:underline">
-                Explore Wedding Suite →
-              </Link>
-            </div>
-          </motion.div>
-
-          {/* 5. Small Card: Food & Restaurant (Spans 4 cols) */}
-          <motion.div
-            initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
-            whileInView={shouldReduceMotion ? undefined : { opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: 0.25 }}
-            className="md:col-span-4 bg-white rounded-3xl p-6 border border-[rgba(23,23,23,0.12)] shadow-xs flex flex-col justify-between group min-h-[340px]"
-          >
-            <div className="space-y-2">
-              <span className="text-xs font-extrabold text-amber-600 uppercase tracking-wider block">
-                MENUS & CAFE ADS
-              </span>
-              <h3 className="text-xl font-extrabold text-[#171717]">{foodCol.title}</h3>
-              <p className="text-xs text-[#6F6A63] leading-relaxed">{foodCol.description}</p>
-            </div>
-
-            <div className="my-4 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-100 border border-slate-200">
-              <img
-                src={foodCol.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                alt={foodCol.title}
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
-                }}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-            </div>
-
-            <div className="flex items-center justify-between border-t border-slate-100 pt-3">
-              <span className="text-xs text-[#6F6A63] font-medium">{foodCol.assetCount}+ Menu Designs</span>
-              <Link href={`/assets?category=Food+%26+Restaurant`} className="text-xs font-bold text-[#6D28D9] hover:underline">
-                Explore Food Kits →
-              </Link>
-            </div>
-          </motion.div>
-
+                {/* View Collection Action Revealed on Hover */}
+                <div className="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between">
+                  <Link
+                    href={`/assets?category=${encodeURIComponent(col.title)}`}
+                    className="w-full bg-[#171717] group-hover:bg-[#6D28D9] text-white font-extrabold text-xs py-2.5 rounded-xl transition-colors flex items-center justify-center gap-1.5 shadow-2xs"
+                  >
+                    <span>View Collection Vault</span>
+                    <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-[3px] transition-transform" />
+                  </Link>
+                </div>
+              </motion.div>
+            );
+          })}
         </div>
+
       </div>
     </section>
   );

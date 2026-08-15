@@ -2,88 +2,122 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { ArrowRight, Flame, Sparkles, Star, Download, Zap } from "lucide-react";
-import { ProductCard } from "@/components/product/ProductCard";
+import { ArrowRight, Sparkles } from "lucide-react";
+import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
+import { ProductCard } from "@/components/product/ProductCard";
+import { ProductCardSkeleton } from "@/components/product/ProductCardSkeleton";
 
 type TabType = "featured" | "latest" | "popular" | "free" | "premium";
 
 export const ExploreAssets: React.FC = () => {
+  const shouldReduceMotion = useReducedMotion();
   const [activeTab, setActiveTab] = useState<TabType>("featured");
+  const [isLoading, setIsLoading] = useState(false);
 
-  const filteredProducts = MOCK_PRODUCTS.filter((product) => {
-    if (activeTab === "free") return product.isFree;
-    if (activeTab === "premium") return !product.isFree;
-    if (activeTab === "latest") return product.isNew;
-    if (activeTab === "popular") return product.isBestSeller;
-    return true; // featured shows all curated assets
-  }).slice(0, 8);
+  const handleTabChange = (tab: TabType) => {
+    setIsLoading(true);
+    setActiveTab(tab);
+    setTimeout(() => setIsLoading(false), 200);
+  };
 
-  const tabs: { id: TabType; label: string; icon?: React.ElementType }[] = [
-    { id: "featured", label: "Featured Assets", icon: Sparkles },
-    { id: "popular", label: "Best Sellers", icon: Flame },
-    { id: "latest", label: "New Releases", icon: Star },
-    { id: "free", label: "Free Downloads", icon: Download },
-    { id: "premium", label: "Premium Bundles", icon: Zap },
-  ];
+  const getFilteredProducts = () => {
+    switch (activeTab) {
+      case "latest":
+        return MOCK_PRODUCTS.filter((p) => p.isNew || p.id === "prod-1" || p.id === "prod-6");
+      case "popular":
+        return MOCK_PRODUCTS.filter((p) => p.isBestSeller || p.downloadCount > 1500);
+      case "free":
+        return MOCK_PRODUCTS.filter((p) => p.isFree);
+      case "premium":
+        return MOCK_PRODUCTS.filter((p) => !p.isFree);
+      case "featured":
+      default:
+        return MOCK_PRODUCTS.slice(0, 12);
+    }
+  };
+
+  const filteredProducts = getFilteredProducts();
 
   return (
-    <section className="py-16 bg-[#F8FAFC]">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-8">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-violet-700 text-xs font-bold uppercase tracking-wider mb-2">
-              <Sparkles className="w-4 h-4 text-cyan-600" />
-              Curated Asset Vault
+    <section className="py-20 bg-[#FCFAF6] border-b border-[rgba(23,23,23,0.12)]">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
+        
+        {/* Header & Filter Tabs */}
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div className="space-y-1">
+            <div className="inline-flex items-center gap-1.5 text-[#6D28D9] text-xs font-extrabold uppercase tracking-wider">
+              <Sparkles className="w-4 h-4 text-[#06B6D4]" />
+              Digital Asset Catalog
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-              Explore Top Digital Assets
+            <h2 className="text-3xl sm:text-4xl font-black text-[#171717] tracking-tight">
+              Explore Fresh Creative Assets
             </h2>
-            <p className="text-slate-500 text-xs sm:text-sm mt-1">
-              PSD templates, Canva links, vectors and 3D icons built for high conversion.
-            </p>
           </div>
 
-          {/* Tab Selector */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-2 scrollbar-none">
-            {tabs.map((tab) => {
-              const Icon = tab.icon;
-              const isActive = activeTab === tab.id;
-              return (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap transition-all ${
-                    isActive
-                      ? "bg-violet-700 text-white shadow-md shadow-violet-200"
-                      : "bg-white text-slate-600 hover:bg-slate-100 border border-slate-200"
-                  }`}
-                >
-                  {Icon && <Icon className={`w-3.5 h-3.5 ${isActive ? "text-cyan-300" : "text-slate-400"}`} />}
-                  <span>{tab.label}</span>
-                </button>
-              );
-            })}
+          {/* Filter Pills */}
+          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 scrollbar-none bg-[#F5F2EC] p-1.5 rounded-2xl border border-[rgba(23,23,23,0.12)]">
+            {[
+              { id: "featured" as const, label: "Featured" },
+              { id: "latest" as const, label: "Latest Drops" },
+              { id: "popular" as const, label: "Popular" },
+              { id: "free" as const, label: "Free Vault" },
+              { id: "premium" as const, label: "Pro PSDs" },
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => handleTabChange(tab.id)}
+                className={`px-4 py-2 rounded-xl text-xs font-extrabold transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? "bg-[#6D28D9] text-white shadow-xs"
+                    : "text-[#6F6A63] hover:text-[#171717]"
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
           </div>
         </div>
 
-        {/* Product Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
-          {filteredProducts.map((product) => (
-            <ProductCard key={product.id} product={product} />
-          ))}
-        </div>
+        {/* 5-6 Column Responsive Product Grid */}
+        <AnimatePresence mode="wait">
+          {isLoading ? (
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+              {Array.from({ length: 12 }).map((_, idx) => (
+                <ProductCardSkeleton key={idx} />
+              ))}
+            </div>
+          ) : (
+            <motion.div
+              key={activeTab}
+              initial={shouldReduceMotion ? false : { opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={shouldReduceMotion ? undefined : { opacity: 0 }}
+              transition={{ duration: 0.2 }}
+              className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4"
+            >
+              {filteredProducts.map((product, idx) => (
+                <ProductCard
+                  key={product.id}
+                  product={product}
+                  isFeatured={activeTab === "featured" && idx === 0}
+                />
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
-        {/* View All CTA */}
-        <div className="mt-12 text-center">
+        {/* View Catalog Footer CTA */}
+        <div className="text-center pt-4">
           <Link
             href="/assets"
-            className="inline-flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs sm:text-sm px-6 py-3.5 rounded-2xl transition-all shadow-md hover:shadow-lg"
+            className="inline-flex items-center gap-2 bg-[#171717] hover:bg-[#6D28D9] text-white font-extrabold text-xs px-8 py-3.5 rounded-xl transition-all shadow-md hover:-translate-y-[1px] group"
           >
-            Explore All 2,500+ Assets in Catalog
-            <ArrowRight className="w-4 h-4 text-cyan-400" />
+            <span>Browse All 2,500+ Assets</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-[3px] transition-transform" />
           </Link>
         </div>
+
       </div>
     </section>
   );
