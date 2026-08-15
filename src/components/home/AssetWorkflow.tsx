@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import Link from "next/link";
-import { ArrowRight, Smartphone, Image, Tv, Monitor, CheckCircle2, Layers } from "lucide-react";
+import { Smartphone, Image, Tv, Monitor, CheckCircle2 } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
 import { FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";

@@ -2,7 +2,7 @@
 
 import React from "react";
 import Link from "next/link";
-import { ArrowRight, Sparkles, Layers } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { motion, useReducedMotion } from "framer-motion";
 import { MOCK_COLLECTIONS } from "@/data/mock-collections";
 import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
@@ -15,7 +15,6 @@ export const CuratedCollections: React.FC = () => {
   const businessCol = MOCK_COLLECTIONS.find((c) => c.id === "col-business") || MOCK_COLLECTIONS[2];
   const weddingCol = MOCK_COLLECTIONS.find((c) => c.id === "col-wedding") || MOCK_COLLECTIONS[3];
   const foodCol = MOCK_COLLECTIONS.find((c) => c.id === "col-food") || MOCK_COLLECTIONS[4];
-  const creatorCol = MOCK_COLLECTIONS.find((c) => c.id === "col-creator") || MOCK_COLLECTIONS[5];
 
   return (
     <section className="py-20 bg-[#F5F2EC] border-b border-[rgba(23,23,23,0.12)] text-[#171717]">

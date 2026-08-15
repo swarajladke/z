@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { Search, Sparkles, ArrowRight, Layers, Monitor, Smartphone, Image, Tv } from "lucide-react";
+import { Search, Sparkles, ArrowRight, Monitor, Smartphone, Image } from "lucide-react";
 import { motion, useReducedMotion, Variants } from "framer-motion";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
 import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
@@ -245,7 +245,7 @@ export const Hero: React.FC = () => {
               <div className="relative z-20 w-3/4 aspect-[1/1] rounded-2xl overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl group transition-transform duration-300 hover:scale-[1.02]">
                 <img
                   src={heroAsset?.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
-                  alt={heroAsset?.title}
+                  alt={heroAsset?.title || "Campaign mockup"}
                   onError={(e) => {
                     (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
                   }}
