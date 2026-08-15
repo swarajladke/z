@@ -29,6 +29,7 @@ export interface Product {
   originalPriceInPaise?: number; // Integer paise e.g. 29900 = ₹299
   price: number; // Rupees fallback getter helper for backwards compatibility
   originalPrice?: number;
+  status?: 'Published' | 'Draft' | 'Archived';
   isFree?: boolean;
   isPremium?: boolean;
   isBundle?: boolean;

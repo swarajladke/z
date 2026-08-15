@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Product, CartItem, LicenseType } from "@/types";
 import { calculateLicensePricePaise } from "@/lib/utils";
 
@@ -25,48 +25,42 @@ interface CartContextType {
   totalItemCount: number;
 }
 
+const DEFAULT_INITIAL_CART_ITEM: CartItem = {
+  product: {
+    id: "prod-1",
+    slug: "independence-day-social-media-pack",
+    title: "Independence Day Social Media Pack",
+    category: "Festival Designs",
+    assetType: "Template",
+    tags: ["Independence Day"],
+    description: "Fully editable social media templates for 15th August.",
+    includedFilesText: "15 PSD files",
+    priceInPaise: 14900,
+    price: 149,
+    originalPriceInPaise: 29900,
+    originalPrice: 299,
+    isPremium: true,
+    fileFormats: ["PSD", "Canva"],
+    softwareCompatibility: ["Photoshop", "Canva"],
+    thumbnailUrl: "https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&w=800&q=80",
+    galleryImages: [],
+    lastUpdated: "2026-08-01",
+    downloadCount: 1420,
+    ratingPlaceholder: 4.9,
+  },
+  selectedLicense: "commercial",
+  calculatedPriceInPaise: calculateLicensePricePaise(14900, "commercial"),
+  quantity: 1,
+};
+
 const CartContext = createContext<CartContextType | undefined>(undefined);
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [cartItems, setCartItems] = useState<CartItem[]>([]);
+  // Initialize state directly without setState in useEffect
+  const [cartItems, setCartItems] = useState<CartItem[]>([DEFAULT_INITIAL_CART_ITEM]);
   const [couponCode, setCouponCode] = useState<string>("");
   const [couponDiscountPercent, setCouponDiscountPercent] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
-
-  // Initialize cart with a default item
-  useEffect(() => {
-    const basePaise = 14900;
-    const calcPaise = calculateLicensePricePaise(basePaise, "commercial");
-    setCartItems([
-      {
-        product: {
-          id: "prod-1",
-          slug: "independence-day-social-media-pack",
-          title: "Independence Day Social Media Pack",
-          category: "Festival Designs",
-          assetType: "Template",
-          tags: ["Independence Day"],
-          description: "Fully editable social media templates for 15th August.",
-          includedFilesText: "15 PSD files",
-          priceInPaise: 14900,
-          price: 149,
-          originalPriceInPaise: 29900,
-          originalPrice: 299,
-          isPremium: true,
-          fileFormats: ["PSD", "Canva"],
-          softwareCompatibility: ["Photoshop", "Canva"],
-          thumbnailUrl: "https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&w=800&q=80",
-          galleryImages: [],
-          lastUpdated: "2026-08-01",
-          downloadCount: 1420,
-          ratingPlaceholder: 4.9,
-        },
-        selectedLicense: "commercial",
-        calculatedPriceInPaise: calcPaise, // 22350 paise = ₹223.5 -> ₹223
-        quantity: 1, // Digital asset single download seat
-      },
-    ]);
-  }, []);
 
   const addToCart = (product: Product, license: LicenseType = "commercial") => {
     const basePaise = product.priceInPaise ?? Math.round(product.price * 100);
@@ -78,7 +72,6 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         (item) => item.product.id === product.id && item.selectedLicense === license
       );
       if (existingIndex > -1) {
-        // Prevent duplicate entries for digital items
         return prev;
       }
       return [

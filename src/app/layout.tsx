@@ -6,10 +6,7 @@ import { CartProvider } from "@/context/CartContext";
 import { WishlistProvider } from "@/context/WishlistContext";
 import { AuthProvider } from "@/context/AuthContext";
 import { QuickPreviewProvider } from "@/context/QuickPreviewContext";
-import { AnnouncementBar } from "@/components/layout/AnnouncementBar";
-import { Footer } from "@/components/layout/Footer";
-import { CartDrawer } from "@/components/cart/CartDrawer";
-import { QuickPreviewModal } from "@/components/product/QuickPreviewModal";
+import { StorefrontShell } from "@/components/layout/StorefrontShell";
 
 const manrope = Manrope({
   subsets: ["latin"],
@@ -48,11 +45,7 @@ export default function RootLayout({
           <CartProvider>
             <WishlistProvider>
               <QuickPreviewProvider>
-                <AnnouncementBar />
-                <div className="flex-1">{children}</div>
-                <Footer />
-                <CartDrawer />
-                <QuickPreviewModal />
+                <StorefrontShell>{children}</StorefrontShell>
               </QuickPreviewProvider>
             </WishlistProvider>
           </CartProvider>
