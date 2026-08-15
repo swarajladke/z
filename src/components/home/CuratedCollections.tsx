@@ -4,7 +4,7 @@ import React from "react";
 import Link from "next/link";
 import { Sparkles, ArrowRight, Layers } from "lucide-react";
 import { MOCK_COLLECTIONS } from "@/data/mock-collections";
-import { formatCurrency } from "@/lib/utils";
+import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export const CuratedCollections: React.FC = () => {
   return (
@@ -40,10 +40,13 @@ export const CuratedCollections: React.FC = () => {
               className="group bg-white rounded-2xl border border-slate-200/80 p-5 overflow-hidden shadow-xs hover:shadow-xl hover:border-violet-300 transition-all duration-300 flex flex-col justify-between"
             >
               <div>
-                <div className="relative aspect-16/9 rounded-xl overflow-hidden mb-4 bg-slate-100">
+                <div className="relative aspect-[16/9] rounded-xl overflow-hidden mb-4 bg-slate-100">
                   <img
-                    src={col.thumbnailUrl}
+                    src={col.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
                     alt={col.title}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                    }}
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   />
                   {col.badge && (
@@ -69,7 +72,7 @@ export const CuratedCollections: React.FC = () => {
 
               <div className="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between">
                 <span className="text-xs text-slate-500">
-                  Starting at <strong className="text-slate-900 font-bold">{formatCurrency(col.startingPrice)}</strong>
+                  Starting at <strong className="text-slate-900 font-bold">{formatPaiseToINR(col.startingPriceInPaise || col.startingPrice * 100)}</strong>
                 </span>
                 <span className="text-xs font-bold text-violet-700 flex items-center gap-1 group-hover:translate-x-1 transition-transform">
                   View Collection →

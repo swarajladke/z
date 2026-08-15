@@ -25,7 +25,9 @@ export interface Product {
   tags: string[];
   description: string;
   includedFilesText: string;
-  price: number; // in INR
+  priceInPaise: number; // Integer paise e.g. 14900 = ₹149
+  originalPriceInPaise?: number; // Integer paise e.g. 29900 = ₹299
+  price: number; // Rupees fallback getter helper for backwards compatibility
   originalPrice?: number;
   isFree?: boolean;
   isPremium?: boolean;
@@ -61,6 +63,7 @@ export interface Collection {
   title: string;
   description: string;
   assetCount: number;
+  startingPriceInPaise: number;
   startingPrice: number;
   thumbnailUrl: string;
   previewImages: string[];
@@ -71,15 +74,17 @@ export interface Collection {
 export interface CartItem {
   product: Product;
   selectedLicense: LicenseType;
-  calculatedPrice: number;
+  calculatedPriceInPaise: number;
   quantity: number;
 }
 
 export interface PricingPlan {
   id: string;
   name: string;
+  monthlyPriceInPaise: number;
+  yearlyPriceInPaise: number;
   monthlyPrice: number;
-  yearlyPrice: number; // billed annually
+  yearlyPrice: number;
   downloadsPerMonth: number;
   libraryAccess: string;
   licenseIncluded: string;
@@ -97,12 +102,15 @@ export interface Order {
     productTitle: string;
     thumbnailUrl: string;
     license: LicenseType;
+    priceInPaise: number;
     price: number;
     format: string;
   }[];
+  subtotalInPaise: number;
+  discountInPaise: number;
+  totalInPaise: number;
   subtotal: number;
   discount: number;
-  tax: number;
   total: number;
   paymentStatus: 'Paid' | 'Pending' | 'Failed';
   paymentMethod: string;
@@ -113,6 +121,7 @@ export interface CustomerUser {
   id: string;
   name: string;
   email: string;
+  role?: 'admin' | 'customer';
   avatarUrl?: string;
   activePlan?: string;
   downloadsRemaining: number;
@@ -121,6 +130,7 @@ export interface CustomerUser {
 }
 
 export interface AdminStats {
+  totalRevenueInPaise: number;
   totalRevenue: number;
   totalOrders: number;
   totalDownloads: number;

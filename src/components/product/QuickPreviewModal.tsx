@@ -2,12 +2,12 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { X, Heart, ShoppingBag, Check, Shield, FileCheck, Layers, Sparkles } from "lucide-react";
+import { X, Heart, ShoppingBag, Check, FileCheck, Layers } from "lucide-react";
 import { useQuickPreview } from "@/context/QuickPreviewContext";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { LicenseType } from "@/types";
-import { formatCurrency, calculateLicensePrice } from "@/lib/utils";
+import { formatPaiseToINR, calculateLicensePricePaise, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export const QuickPreviewModal: React.FC = () => {
   const { previewProduct, closeQuickPreview } = useQuickPreview();
@@ -17,7 +17,8 @@ export const QuickPreviewModal: React.FC = () => {
 
   if (!previewProduct) return null;
 
-  const currentPrice = calculateLicensePrice(previewProduct.price, selectedLicense);
+  const basePaise = previewProduct.priceInPaise ?? Math.round(previewProduct.price * 100);
+  const currentPaise = calculateLicensePricePaise(basePaise, selectedLicense);
   const inWishlist = isInWishlist(previewProduct.id);
 
   const handleAddToCart = () => {
@@ -42,10 +43,13 @@ export const QuickPreviewModal: React.FC = () => {
 
         {/* Left: Product Media Preview */}
         <div className="md:w-1/2 bg-slate-950 p-6 flex flex-col justify-between relative overflow-hidden">
-          <div className="relative aspect-4/3 rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
+          <div className="relative aspect-[4/3] rounded-xl overflow-hidden bg-slate-900 border border-slate-800 flex items-center justify-center">
             <img
-              src={previewProduct.thumbnailUrl}
+              src={previewProduct.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
               alt={previewProduct.title}
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+              }}
               className="w-full h-full object-cover"
             />
             {/* Watermark overlay placeholder */}
@@ -57,11 +61,14 @@ export const QuickPreviewModal: React.FC = () => {
           </div>
 
           <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
-            {previewProduct.galleryImages.map((img, idx) => (
+            {(previewProduct.galleryImages || []).map((img, idx) => (
               <img
                 key={idx}
-                src={img}
+                src={img || FALLBACK_IMAGE_DATA_URL}
                 alt="preview thumbnail"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                }}
                 className="w-14 h-14 rounded-lg object-cover border border-slate-700 opacity-80 hover:opacity-100 cursor-pointer"
               />
             ))}
@@ -137,12 +144,12 @@ export const QuickPreviewModal: React.FC = () => {
                 {previewProduct.isFree ? (
                   <span className="text-emerald-600">FREE</span>
                 ) : (
-                  formatCurrency(currentPrice)
+                  formatPaiseToINR(currentPaise)
                 )}
               </span>
-              {previewProduct.originalPrice && !previewProduct.isFree && (
+              {previewProduct.originalPriceInPaise && !previewProduct.isFree && (
                 <span className="text-sm text-slate-400 line-through">
-                  {formatCurrency(previewProduct.originalPrice)}
+                  {formatPaiseToINR(previewProduct.originalPriceInPaise)}
                 </span>
               )}
             </div>

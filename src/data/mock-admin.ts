@@ -1,6 +1,7 @@
 import { AdminStats } from "@/types";
 
 export const MOCK_ADMIN_STATS: AdminStats = {
+  totalRevenueInPaise: 34280000,
   totalRevenue: 342800,
   totalOrders: 1240,
   totalDownloads: 8940,

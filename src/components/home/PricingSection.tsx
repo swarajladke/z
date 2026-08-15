@@ -2,9 +2,9 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Check, Sparkles, Zap, ArrowRight } from "lucide-react";
+import { Check, Zap, ArrowRight } from "lucide-react";
 import { MOCK_PRICING_PLANS } from "@/data/mock-pricing";
-import { formatCurrency } from "@/lib/utils";
+import { formatPaiseToINR } from "@/lib/utils";
 
 export const PricingSection: React.FC = () => {
   const [isYearly, setIsYearly] = useState(false);
@@ -55,19 +55,21 @@ export const PricingSection: React.FC = () => {
         {/* Pricing Cards Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch max-w-6xl mx-auto">
           {MOCK_PRICING_PLANS.map((plan) => {
-            const price = isYearly ? Math.round(plan.yearlyPrice / 12) : plan.monthlyPrice;
+            const monthlyPaise = plan.monthlyPriceInPaise || plan.monthlyPrice * 100;
+            const yearlyPaise = plan.yearlyPriceInPaise || plan.yearlyPrice * 100;
+            const pricePaise = isYearly ? Math.floor(yearlyPaise / 12) : monthlyPaise;
 
             return (
               <div
                 key={plan.id}
                 className={`bg-white rounded-3xl p-8 border flex flex-col justify-between transition-all duration-300 relative ${
                   plan.isPopular
-                    ? "border-violet-600 shadow-2xl ring-2 ring-violet-600/20 scale-102"
+                    ? "border-violet-600 shadow-2xl ring-2 ring-violet-600/20 md:scale-105 z-10"
                     : "border-slate-200/80 shadow-md hover:border-slate-300"
                 }`}
               >
                 {plan.isPopular && (
-                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-violet-700 text-white text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-md">
+                  <span className="absolute -top-3.5 left-1/2 -translate-x-1/2 bg-violet-700 text-white text-[11px] font-extrabold uppercase px-3 py-1 rounded-full shadow-md whitespace-nowrap">
                     MOST POPULAR FOR CREATORS
                   </span>
                 )}
@@ -78,12 +80,12 @@ export const PricingSection: React.FC = () => {
 
                   <div className="my-6 flex items-baseline gap-1">
                     <span className="text-4xl font-black text-slate-900">
-                      {formatCurrency(price)}
+                      {formatPaiseToINR(pricePaise)}
                     </span>
                     <span className="text-xs text-slate-500 font-semibold">/month</span>
                     {isYearly && (
                       <span className="text-[11px] text-slate-400 block ml-2">
-                        (Billed {formatCurrency(plan.yearlyPrice)}/yr)
+                        (Billed {formatPaiseToINR(yearlyPaise)}/yr)
                       </span>
                     )}
                   </div>

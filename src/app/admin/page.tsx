@@ -12,22 +12,19 @@ import {
   Tag,
   Award,
   Star,
-  Image,
-  HelpCircle,
+  Image as ImageIcon,
   Settings,
-  ArrowUpRight,
   TrendingUp,
   Plus,
   Edit,
   Trash2,
-  Check,
   X,
-  Sparkles,
+  ShieldAlert,
 } from "lucide-react";
 import { MOCK_ADMIN_STATS, MOCK_REVENUE_CHART, MOCK_RECENT_CUSTOMERS } from "@/data/mock-admin";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
 import { MOCK_ORDERS } from "@/data/mock-orders";
-import { formatCurrency } from "@/lib/utils";
+import { formatPaiseToINR } from "@/lib/utils";
 import { Product } from "@/types";
 
 export default function AdminDashboardPage() {
@@ -41,6 +38,7 @@ export default function AdminDashboardPage() {
       title: "",
       category: "Festival Designs",
       assetType: "Template",
+      priceInPaise: 19900,
       price: 199,
       isPremium: true,
       fileFormats: ["PSD", "Canva"],
@@ -55,9 +53,21 @@ export default function AdminDashboardPage() {
     e.preventDefault();
     if (!editingProduct?.title) return;
 
+    const rupees = editingProduct.price || Math.floor((editingProduct.priceInPaise || 0) / 100);
+    const paise = editingProduct.priceInPaise || rupees * 100;
+
     if (editingProduct.id) {
       setProductsList((prev) =>
-        prev.map((p) => (p.id === editingProduct.id ? ({ ...p, ...editingProduct } as Product) : p))
+        prev.map((p) =>
+          p.id === editingProduct.id
+            ? ({
+                ...p,
+                ...editingProduct,
+                priceInPaise: paise,
+                price: rupees,
+              } as Product)
+            : p
+        )
       );
     } else {
       const newProd: Product = {
@@ -69,9 +79,10 @@ export default function AdminDashboardPage() {
         tags: ["New Release"],
         description: editingProduct.description || "",
         includedFilesText: editingProduct.includedFilesText || "",
-        price: editingProduct.price || 0,
-        isFree: editingProduct.price === 0,
-        isPremium: editingProduct.price ? editingProduct.price > 0 : false,
+        priceInPaise: paise,
+        price: rupees,
+        isFree: paise === 0,
+        isPremium: paise > 0,
         fileFormats: editingProduct.fileFormats || ["PSD"],
         softwareCompatibility: editingProduct.softwareCompatibility || ["Photoshop"],
         thumbnailUrl:
@@ -117,7 +128,7 @@ export default function AdminDashboardPage() {
               { id: "coupons", label: "Coupons & Discounts", icon: Tag },
               { id: "plans", label: "Pricing Plans", icon: Award },
               { id: "reviews", label: "Asset Reviews", icon: Star },
-              { id: "banners", label: "Hero Banners", icon: Image },
+              { id: "banners", label: "Hero Banners", icon: ImageIcon },
               { id: "settings", label: "Store Settings", icon: Settings },
             ].map((item) => (
               <button
@@ -155,7 +166,10 @@ export default function AdminDashboardPage() {
         {/* Top Header */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-6">
           <div>
-            <h1 className="text-2xl font-black text-white">Single-Seller Dashboard</h1>
+            <div className="flex items-center gap-2">
+              <ShieldAlert className="w-5 h-5 text-violet-400" />
+              <h1 className="text-2xl font-black text-white">Single-Seller Admin Panel</h1>
+            </div>
             <p className="text-xs text-slate-400 mt-1">
               Manage product listings, monitor revenue, track customer downloads and issue coupons.
             </p>
@@ -176,7 +190,9 @@ export default function AdminDashboardPage() {
             <div className="grid grid-cols-2 lg:grid-cols-5 gap-4">
               <div className="bg-slate-900 border border-slate-800 p-5 rounded-2xl space-y-2">
                 <span className="text-xs text-slate-400 font-semibold">Total Revenue</span>
-                <div className="text-2xl font-black text-white">{formatCurrency(MOCK_ADMIN_STATS.totalRevenue)}</div>
+                <div className="text-2xl font-black text-white">
+                  {formatPaiseToINR(MOCK_ADMIN_STATS.totalRevenueInPaise || MOCK_ADMIN_STATS.totalRevenue * 100)}
+                </div>
                 <div className="text-[11px] text-emerald-400 font-bold flex items-center gap-1">
                   <TrendingUp className="w-3 h-3" /> +18.4% vs last month
                 </div>
@@ -263,7 +279,7 @@ export default function AdminDashboardPage() {
                         </div>
                       </div>
                       <span className="text-xs font-extrabold text-cyan-400">
-                        {p.isFree ? "Free" : formatCurrency(p.price)}
+                        {p.isFree ? "Free" : formatPaiseToINR(p.priceInPaise || p.price * 100)}
                       </span>
                     </div>
                   ))}
@@ -284,7 +300,7 @@ export default function AdminDashboardPage() {
                         <div className="text-[10px] text-slate-400">{c.email}</div>
                       </div>
                       <div className="text-right">
-                        <span className="font-bold text-emerald-400 block">{formatCurrency(c.spend)}</span>
+                        <span className="font-bold text-emerald-400 block">{formatPaiseToINR(c.spend * 100)}</span>
                         <span className="text-[10px] text-slate-500">{c.date}</span>
                       </div>
                     </div>
@@ -333,7 +349,7 @@ export default function AdminDashboardPage() {
                       <td className="p-3">{prod.category}</td>
                       <td className="p-3">{prod.fileFormats.join(", ")}</td>
                       <td className="p-3 font-bold text-cyan-400">
-                        {prod.isFree ? "FREE" : formatCurrency(prod.price)}
+                        {prod.isFree ? "FREE" : formatPaiseToINR(prod.priceInPaise || prod.price * 100)}
                       </td>
                       <td className="p-3">{prod.downloadCount}</td>
                       <td className="p-3 text-right space-x-2">
@@ -410,7 +426,13 @@ export default function AdminDashboardPage() {
                   <input
                     type="number"
                     value={editingProduct?.price || 0}
-                    onChange={(e) => setEditingProduct({ ...editingProduct, price: Number(e.target.value) })}
+                    onChange={(e) =>
+                      setEditingProduct({
+                        ...editingProduct,
+                        price: Number(e.target.value),
+                        priceInPaise: Number(e.target.value) * 100,
+                      })
+                    }
                     className="w-full bg-slate-800 border border-slate-700 rounded-xl px-3 py-2 text-white font-medium"
                   />
                 </div>

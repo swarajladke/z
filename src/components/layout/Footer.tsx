@@ -2,12 +2,14 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { Mail, Globe, Sparkles, Shield, Heart } from "lucide-react";
+import { Mail, Globe } from "lucide-react";
 import { BRAND_CONFIG } from "@/config/brand.config";
+import { useAuth } from "@/context/AuthContext";
 
 export const Footer: React.FC = () => {
   const [currency, setCurrency] = useState("INR (₹)");
   const [language, setLanguage] = useState("English (IN)");
+  const { isAdmin } = useAuth();
 
   return (
     <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
@@ -105,11 +107,14 @@ export const Footer: React.FC = () => {
                   Customer Login
                 </Link>
               </li>
-              <li>
-                <Link href="/admin" className="hover:text-violet-400 font-semibold transition-colors">
-                  Single-Seller Admin
-                </Link>
-              </li>
+              {/* Only render Admin UI link if user is logged in as admin */}
+              {isAdmin && (
+                <li>
+                  <Link href="/admin" className="hover:text-violet-400 font-semibold transition-colors">
+                    Admin UI
+                  </Link>
+                </li>
+              )}
             </ul>
           </div>
 

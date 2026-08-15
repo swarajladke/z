@@ -2,21 +2,23 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { Product, CartItem, LicenseType } from "@/types";
-import { calculateLicensePrice } from "@/lib/utils";
+import { calculateLicensePricePaise } from "@/lib/utils";
 
 interface CartContextType {
   cartItems: CartItem[];
   addToCart: (product: Product, license?: LicenseType) => void;
   removeFromCart: (productId: string, license: LicenseType) => void;
-  updateQuantity: (productId: string, license: LicenseType, quantity: number) => void;
+  updateItemLicense: (productId: string, oldLicense: LicenseType, newLicense: LicenseType) => void;
   clearCart: () => void;
   couponCode: string;
   couponDiscountPercent: number;
   applyCoupon: (code: string) => { success: boolean; message: string };
   removeCoupon: () => void;
+  subtotalInPaise: number;
+  discountAmountInPaise: number;
+  totalAmountInPaise: number;
   subtotal: number;
   discountAmount: number;
-  taxAmount: number;
   totalAmount: number;
   isCartOpen: boolean;
   setIsCartOpen: (open: boolean) => void;
@@ -31,9 +33,10 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [couponDiscountPercent, setCouponDiscountPercent] = useState<number>(0);
   const [isCartOpen, setIsCartOpen] = useState<boolean>(false);
 
-  // Initialize cart from initial mock item if empty
+  // Initialize cart with a default item
   useEffect(() => {
-    // Add default item for demonstration
+    const basePaise = 14900;
+    const calcPaise = calculateLicensePricePaise(basePaise, "commercial");
     setCartItems([
       {
         product: {
@@ -45,7 +48,9 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           tags: ["Independence Day"],
           description: "Fully editable social media templates for 15th August.",
           includedFilesText: "15 PSD files",
+          priceInPaise: 14900,
           price: 149,
+          originalPriceInPaise: 29900,
           originalPrice: 299,
           isPremium: true,
           fileFormats: ["PSD", "Canva"],
@@ -57,29 +62,31 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
           ratingPlaceholder: 4.9,
         },
         selectedLicense: "commercial",
-        calculatedPrice: 223, // 149 * 1.5
-        quantity: 1,
+        calculatedPriceInPaise: calcPaise, // 22350 paise = ₹223.5 -> ₹223
+        quantity: 1, // Digital asset single download seat
       },
     ]);
   }, []);
 
   const addToCart = (product: Product, license: LicenseType = "commercial") => {
-    const itemPrice = calculateLicensePrice(product.price, license);
+    const basePaise = product.priceInPaise ?? Math.round(product.price * 100);
+    const itemPricePaise = calculateLicensePricePaise(basePaise, license);
+
     setCartItems((prev) => {
+      // Check if product is already in cart with the SAME license
       const existingIndex = prev.findIndex(
         (item) => item.product.id === product.id && item.selectedLicense === license
       );
       if (existingIndex > -1) {
-        const updated = [...prev];
-        updated[existingIndex].quantity += 1;
-        return updated;
+        // Prevent duplicate entries for digital items
+        return prev;
       }
       return [
         ...prev,
         {
           product,
           selectedLicense: license,
-          calculatedPrice: itemPrice,
+          calculatedPriceInPaise: itemPricePaise,
           quantity: 1,
         },
       ];
@@ -95,19 +102,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     );
   };
 
-  const updateQuantity = (productId: string, license: LicenseType, quantity: number) => {
-    if (quantity <= 0) {
-      removeFromCart(productId, license);
-      return;
-    }
-    setCartItems((prev) =>
-      prev.map((item) => {
-        if (item.product.id === productId && item.selectedLicense === license) {
-          return { ...item, quantity };
+  const updateItemLicense = (productId: string, oldLicense: LicenseType, newLicense: LicenseType) => {
+    setCartItems((prev) => {
+      return prev.map((item) => {
+        if (item.product.id === productId && item.selectedLicense === oldLicense) {
+          const basePaise = item.product.priceInPaise ?? Math.round(item.product.price * 100);
+          const newPricePaise = calculateLicensePricePaise(basePaise, newLicense);
+          return {
+            ...item,
+            selectedLicense: newLicense,
+            calculatedPriceInPaise: newPricePaise,
+          };
         }
         return item;
-      })
-    );
+      });
+    });
   };
 
   const clearCart = () => {
@@ -136,16 +145,17 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setCouponDiscountPercent(0);
   };
 
-  const subtotal = cartItems.reduce(
-    (sum, item) => sum + item.calculatedPrice * item.quantity,
+  const subtotalInPaise = cartItems.reduce(
+    (sum, item) => sum + item.calculatedPriceInPaise,
     0
   );
 
-  const discountAmount = Math.round((subtotal * couponDiscountPercent) / 100);
-  const taxableSubtotal = Math.max(0, subtotal - discountAmount);
-  const taxAmount = Math.round(taxableSubtotal * 0.18); // 18% GST standard in India
-  const totalAmount = taxableSubtotal + taxAmount;
-  const totalItemCount = cartItems.reduce((count, item) => count + item.quantity, 0);
+  const discountAmountInPaise = Math.floor((subtotalInPaise * couponDiscountPercent) / 100);
+  const totalAmountInPaise = Math.max(0, subtotalInPaise - discountAmountInPaise);
+
+  const subtotal = Math.floor(subtotalInPaise / 100);
+  const discountAmount = Math.floor(discountAmountInPaise / 100);
+  const totalAmount = Math.floor(totalAmountInPaise / 100);
 
   return (
     <CartContext.Provider
@@ -153,19 +163,21 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
         cartItems,
         addToCart,
         removeFromCart,
-        updateQuantity,
+        updateItemLicense,
         clearCart,
         couponCode,
         couponDiscountPercent,
         applyCoupon,
         removeCoupon,
+        subtotalInPaise,
+        discountAmountInPaise,
+        totalAmountInPaise,
         subtotal,
         discountAmount,
-        taxAmount,
         totalAmount,
         isCartOpen,
         setIsCartOpen,
-        totalItemCount,
+        totalItemCount: cartItems.length,
       }}
     >
       {children}

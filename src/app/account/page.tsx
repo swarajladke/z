@@ -13,20 +13,17 @@ import {
   HelpCircle,
   LogOut,
   CheckCircle2,
-  FileText,
-  Shield,
   Zap,
-  ArrowRight,
-  Trash2,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { SearchBarModal } from "@/components/catalog/SearchBarModal";
 import { ProductCard } from "@/components/product/ProductCard";
+import { EmptyState } from "@/components/ui/EmptyState";
 import { MOCK_CUSTOMER, MOCK_ORDERS } from "@/data/mock-orders";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
 import { useAuth } from "@/context/AuthContext";
 import { useWishlist } from "@/context/WishlistContext";
-import { formatCurrency } from "@/lib/utils";
+import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 function AccountContent() {
   const searchParams = useSearchParams();
@@ -47,24 +44,35 @@ function AccountContent() {
     setTimeout(() => setDownloadMsg(null), 3000);
   };
 
+  const tabs = [
+    { id: "overview", label: "Overview", icon: User },
+    { id: "downloads", label: "My Downloads", icon: Download, count: MOCK_ORDERS.length },
+    { id: "orders", label: "Orders History", icon: ShoppingBag },
+    { id: "wishlist", label: "Saved Wishlist", icon: Heart, count: wishlistProducts.length },
+    { id: "subscription", label: "Subscription Plan", icon: Zap },
+    { id: "billing", label: "Billing", icon: CreditCard },
+    { id: "profile", label: "Profile Settings", icon: Settings },
+    { id: "support", label: "Support & Help", icon: HelpCircle },
+  ];
+
   return (
     <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
       <Header onOpenSearch={() => setIsSearchOpen(true)} />
 
       {/* Hero Header */}
-      <div className="bg-slate-900 text-white py-10 border-b border-slate-800">
+      <div className="bg-slate-900 text-white py-8 sm:py-10 border-b border-slate-800">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
               <img
                 src={user?.avatarUrl || MOCK_CUSTOMER.avatarUrl}
                 alt={user?.name}
-                className="w-14 h-14 rounded-2xl object-cover border-2 border-violet-500 shadow-md"
+                className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl object-cover border-2 border-violet-500 shadow-md shrink-0"
               />
               <div>
                 <div className="flex items-center gap-2">
-                  <h1 className="text-xl sm:text-2xl font-extrabold text-white">{user?.name || MOCK_CUSTOMER.name}</h1>
-                  <span className="bg-violet-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase">
+                  <h1 className="text-lg sm:text-2xl font-extrabold text-white">{user?.name || MOCK_CUSTOMER.name}</h1>
+                  <span className="bg-violet-600 text-white text-[10px] font-extrabold px-2 py-0.5 rounded-full uppercase shrink-0">
                     PRO CREATOR
                   </span>
                 </div>
@@ -72,13 +80,13 @@ function AccountContent() {
               </div>
             </div>
 
-            <div className="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-2xl flex items-center gap-6 text-xs">
+            <div className="bg-slate-800/90 border border-slate-700/80 p-3.5 rounded-2xl flex items-center justify-between sm:justify-start gap-4 sm:gap-6 text-xs">
               <div>
-                <span className="text-slate-400 block text-[11px]">Active Plan</span>
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Active Plan</span>
                 <span className="font-extrabold text-cyan-400">{MOCK_CUSTOMER.activePlan}</span>
               </div>
-              <div className="border-l border-slate-700 pl-6">
-                <span className="text-slate-400 block text-[11px]">Monthly Downloads</span>
+              <div className="border-l border-slate-700 pl-4 sm:pl-6">
+                <span className="text-slate-400 block text-[10px] uppercase font-bold">Monthly Downloads</span>
                 <span className="font-extrabold text-white">{MOCK_CUSTOMER.downloadsRemaining} / 50 Left</span>
               </div>
             </div>
@@ -95,20 +103,34 @@ function AccountContent() {
       )}
 
       {/* Main Account Tabs Layout */}
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-8 flex-1 w-full space-y-6">
+        {/* Mobile Horizontal Scrollable Tab Menu */}
+        <div className="lg:hidden flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none border-b border-slate-200">
+          {tabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-bold whitespace-nowrap shrink-0 transition-colors ${
+                activeTab === tab.id
+                  ? "bg-violet-700 text-white shadow-xs"
+                  : "bg-white text-slate-700 border border-slate-200 hover:bg-slate-50"
+              }`}
+            >
+              <tab.icon className="w-3.5 h-3.5" />
+              <span>{tab.label}</span>
+              {tab.count !== undefined && (
+                <span className="bg-slate-100 text-slate-600 text-[10px] px-1.5 py-0.5 rounded-full font-bold">
+                  {tab.count}
+                </span>
+              )}
+            </button>
+          ))}
+        </div>
+
         <div className="flex flex-col lg:flex-row gap-8">
-          {/* Left Sidebar Navigation */}
-          <aside className="lg:w-64 shrink-0 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs h-fit space-y-1">
-            {[
-              { id: "overview", label: "Overview", icon: User },
-              { id: "downloads", label: "My Downloads", icon: Download, count: MOCK_ORDERS.length },
-              { id: "orders", label: "Orders History", icon: ShoppingBag },
-              { id: "wishlist", label: "Saved Wishlist", icon: Heart, count: wishlistProducts.length },
-              { id: "subscription", label: "Subscription Plan", icon: Zap },
-              { id: "billing", label: "Billing & Invoices", icon: CreditCard },
-              { id: "profile", label: "Account Profile", icon: Settings },
-              { id: "support", label: "Support & Help", icon: HelpCircle },
-            ].map((tab) => (
+          {/* Desktop Sidebar Navigation */}
+          <aside className="hidden lg:block w-64 shrink-0 bg-white p-3 rounded-2xl border border-slate-200 shadow-xs h-fit space-y-1">
+            {tabs.map((tab) => (
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
@@ -166,7 +188,7 @@ function AccountContent() {
                     </span>
                   </div>
                   <div className="bg-white p-5 rounded-2xl border border-slate-200 shadow-xs">
-                    <span className="text-xs font-semibold text-slate-400 block">Monthly Remaining</span>
+                    <span className="text-xs font-semibold text-slate-400 block">Monthly Allowance</span>
                     <span className="text-2xl font-black text-violet-700 mt-1 block">
                       {MOCK_CUSTOMER.downloadsRemaining} / 50
                     </span>
@@ -200,9 +222,12 @@ function AccountContent() {
                         >
                           <div className="flex items-center gap-3">
                             <img
-                              src={item.thumbnailUrl}
+                              src={item.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
                               alt={item.productTitle}
-                              className="w-12 h-12 rounded-lg object-cover bg-slate-100"
+                              onError={(e) => {
+                                (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                              }}
+                              className="w-12 h-12 rounded-lg object-cover bg-slate-100 shrink-0"
                             />
                             <div>
                               <h4 className="font-bold text-slate-900 text-xs">{item.productTitle}</h4>
@@ -214,7 +239,7 @@ function AccountContent() {
 
                           <button
                             onClick={() => handleSimulateDownload(item.productTitle)}
-                            className="bg-violet-700 hover:bg-violet-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1"
+                            className="bg-violet-700 hover:bg-violet-800 text-white text-xs font-bold px-3 py-1.5 rounded-lg flex items-center gap-1 shrink-0"
                           >
                             <Download className="w-3.5 h-3.5" /> Download
                           </button>
@@ -242,9 +267,12 @@ function AccountContent() {
                       >
                         <div className="flex items-center gap-4">
                           <img
-                            src={item.thumbnailUrl}
+                            src={item.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
                             alt={item.productTitle}
-                            className="w-16 h-16 rounded-xl object-cover border border-slate-200"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                            }}
+                            className="w-16 h-16 rounded-xl object-cover border border-slate-200 shrink-0"
                           />
                           <div>
                             <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded uppercase">
@@ -264,12 +292,6 @@ function AccountContent() {
                           >
                             <Download className="w-4 h-4" /> Download Source (ZIP)
                           </button>
-                          <a
-                            href={ord.invoiceUrl}
-                            className="border border-slate-200 text-slate-700 text-xs font-bold px-3 py-2 rounded-xl hover:bg-slate-50"
-                          >
-                            Invoice
-                          </a>
                         </div>
                       </div>
                     ))
@@ -300,7 +322,7 @@ function AccountContent() {
                           <td className="p-3 font-bold text-slate-900">{ord.orderNumber}</td>
                           <td className="p-3">{ord.date}</td>
                           <td className="p-3">{ord.paymentMethod}</td>
-                          <td className="p-3 font-bold">{formatCurrency(ord.total)}</td>
+                          <td className="p-3 font-bold">{formatPaiseToINR(ord.totalInPaise || ord.total * 100)}</td>
                           <td className="p-3">
                             <span className="bg-emerald-100 text-emerald-800 font-bold px-2 py-0.5 rounded text-[10px]">
                               {ord.paymentStatus}
@@ -333,9 +355,12 @@ function AccountContent() {
                     ))}
                   </div>
                 ) : (
-                  <div className="bg-white p-8 rounded-2xl border text-center text-slate-500 text-xs">
-                    Your wishlist is currently empty.
-                  </div>
+                  <EmptyState
+                    title="Your wishlist is empty"
+                    description="Save templates and vectors to your wishlist for quick access later."
+                    actionText="Browse Assets"
+                    actionHref="/assets"
+                  />
                 )}
               </div>
             )}
@@ -350,7 +375,7 @@ function AccountContent() {
 
 export default function AccountPage() {
   return (
-    <Suspense fallback={<div className="p-12 text-center text-slate-500 text-sm">Loading customer dashboard...</div>}>
+    <Suspense fallback={<div className="p-12 text-center text-slate-500 text-sm">Loading customer account...</div>}>
       <AccountContent />
     </Suspense>
   );

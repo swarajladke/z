@@ -7,17 +7,16 @@ import {
   ShoppingBag,
   Trash2,
   ArrowRight,
-  ShieldCheck,
   Tag,
   ChevronRight,
-  Sparkles,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { SearchBarModal } from "@/components/catalog/SearchBarModal";
 import { ProductCard } from "@/components/product/ProductCard";
 import { useCart } from "@/context/CartContext";
+import { LicenseType } from "@/types";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
-import { formatCurrency } from "@/lib/utils";
+import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export default function CartPage() {
   const router = useRouter();
@@ -25,11 +24,10 @@ export default function CartPage() {
   const {
     cartItems,
     removeFromCart,
-    updateQuantity,
-    subtotal,
-    discountAmount,
-    taxAmount,
-    totalAmount,
+    updateItemLicense,
+    subtotalInPaise,
+    discountAmountInPaise,
+    totalAmountInPaise,
     couponCode,
     applyCoupon,
     removeCoupon,
@@ -60,7 +58,7 @@ export default function CartPage() {
             <ChevronRight className="w-3 h-3" />
             <span className="text-white font-medium">Shopping Cart</span>
           </nav>
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Your Shopping Cart</h1>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white">Your Digital Shopping Cart</h1>
         </div>
       </div>
 
@@ -71,7 +69,7 @@ export default function CartPage() {
             <div className="lg:col-span-8 space-y-4">
               <div className="bg-white rounded-2xl border border-slate-200 shadow-xs overflow-hidden">
                 <div className="p-4 border-b border-slate-100 bg-slate-50/50 flex justify-between text-xs font-bold text-slate-500 uppercase tracking-wider">
-                  <span>Product Details</span>
+                  <span>Product & License</span>
                   <span>Price</span>
                 </div>
 
@@ -83,51 +81,53 @@ export default function CartPage() {
                     >
                       <div className="flex items-center gap-4">
                         <img
-                          src={item.product.thumbnailUrl}
+                          src={item.product.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
                           alt={item.product.title}
-                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                          }}
+                          className="w-16 h-16 sm:w-20 sm:h-20 rounded-xl object-cover border border-slate-200 shrink-0"
                         />
                         <div>
-                          <span className="text-[10px] font-bold text-violet-700 bg-violet-50 px-2 py-0.5 rounded uppercase">
-                            {item.selectedLicense} License
-                          </span>
-                          <h3 className="font-bold text-slate-900 text-sm sm:text-base mt-1">
+                          <h3 className="font-bold text-slate-900 text-sm sm:text-base">
                             {item.product.title}
                           </h3>
-                          <div className="text-xs text-slate-500 mt-0.5">
+
+                          {/* License Type Selector directly in cart */}
+                          <div className="mt-1.5 flex items-center gap-2">
+                            <span className="text-xs text-slate-500 font-medium">Selected License:</span>
+                            <select
+                              value={item.selectedLicense}
+                              onChange={(e) =>
+                                updateItemLicense(
+                                  item.product.id,
+                                  item.selectedLicense,
+                                  e.target.value as LicenseType
+                                )
+                              }
+                              className="bg-violet-50 text-violet-800 border border-violet-200 text-xs font-bold px-2.5 py-1 rounded-lg focus:outline-hidden"
+                            >
+                              <option value="personal">Personal License</option>
+                              <option value="commercial">Commercial License</option>
+                              <option value="extended">Extended License</option>
+                            </select>
+                          </div>
+
+                          <div className="text-xs text-slate-400 mt-1">
                             Formats: {item.product.fileFormats.join(", ")}
                           </div>
                         </div>
                       </div>
 
                       <div className="flex items-center justify-between sm:justify-end gap-6 w-full sm:w-auto">
-                        <div className="flex items-center gap-2 border border-slate-200 rounded-xl p-1 text-xs font-semibold">
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.product.id, item.selectedLicense, item.quantity - 1)
-                            }
-                            className="px-2 py-0.5 hover:bg-slate-100 rounded text-slate-500"
-                          >
-                            -
-                          </button>
-                          <span className="px-2 text-slate-800">{item.quantity}</span>
-                          <button
-                            onClick={() =>
-                              updateQuantity(item.product.id, item.selectedLicense, item.quantity + 1)
-                            }
-                            className="px-2 py-0.5 hover:bg-slate-100 rounded text-slate-500"
-                          >
-                            +
-                          </button>
-                        </div>
-
                         <span className="text-base font-extrabold text-slate-900">
-                          {formatCurrency(item.calculatedPrice * item.quantity)}
+                          {formatPaiseToINR(item.calculatedPriceInPaise)}
                         </span>
 
                         <button
                           onClick={() => removeFromCart(item.product.id, item.selectedLicense)}
-                          className="text-slate-300 hover:text-rose-600 p-1"
+                          className="text-slate-300 hover:text-rose-600 p-1 transition-colors"
+                          aria-label="Remove asset"
                         >
                           <Trash2 className="w-5 h-5" />
                         </button>
@@ -189,21 +189,22 @@ export default function CartPage() {
                 <div className="space-y-2 text-xs text-slate-600 pt-2 border-t border-slate-100">
                   <div className="flex justify-between">
                     <span>Subtotal</span>
-                    <span className="font-semibold text-slate-900">{formatCurrency(subtotal)}</span>
+                    <span className="font-semibold text-slate-900">{formatPaiseToINR(subtotalInPaise)}</span>
                   </div>
-                  {discountAmount > 0 && (
+                  {discountAmountInPaise > 0 && (
                     <div className="flex justify-between text-emerald-600 font-semibold">
                       <span>Discount</span>
-                      <span>-{formatCurrency(discountAmount)}</span>
+                      <span>-{formatPaiseToINR(discountAmountInPaise)}</span>
                     </div>
                   )}
-                  <div className="flex justify-between text-slate-500">
-                    <span>Estimated GST (18%)</span>
-                    <span>{formatCurrency(taxAmount)}</span>
+                  {/* Removed hardcoded GST calculation */}
+                  <div className="flex justify-between text-slate-400 italic">
+                    <span>Taxes</span>
+                    <span>Calculated at checkout</span>
                   </div>
                   <div className="flex justify-between pt-3 border-t text-base font-black text-slate-900">
                     <span>Total Amount</span>
-                    <span className="text-violet-700">{formatCurrency(totalAmount)}</span>
+                    <span className="text-violet-700">{formatPaiseToINR(totalAmountInPaise)}</span>
                   </div>
                 </div>
 
@@ -219,7 +220,7 @@ export default function CartPage() {
         ) : (
           /* Empty Cart State with Recommendations */
           <div className="space-y-12">
-            <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center max-w-lg mx-auto space-y-4 shadow-sm">
+            <div className="bg-white p-12 rounded-3xl border border-slate-200 text-center max-w-lg mx-auto space-y-4 shadow-xs">
               <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto">
                 <ShoppingBag className="w-8 h-8" />
               </div>
@@ -229,7 +230,7 @@ export default function CartPage() {
               </p>
               <Link
                 href="/assets"
-                className="inline-flex items-center gap-2 bg-violet-700 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-md"
+                className="inline-flex items-center gap-2 bg-violet-700 text-white font-bold text-xs px-6 py-3 rounded-xl shadow-xs"
               >
                 Browse All Assets <ArrowRight className="w-4 h-4" />
               </Link>

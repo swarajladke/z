@@ -4,6 +4,8 @@ export const MOCK_PRICING_PLANS: PricingPlan[] = [
   {
     id: "plan-starter",
     name: "Starter",
+    monthlyPriceInPaise: 14900,
+    yearlyPriceInPaise: 149000,
     monthlyPrice: 149,
     yearlyPrice: 1490,
     downloadsPerMonth: 15,
@@ -21,6 +23,8 @@ export const MOCK_PRICING_PLANS: PricingPlan[] = [
   {
     id: "plan-creator",
     name: "Creator",
+    monthlyPriceInPaise: 29900,
+    yearlyPriceInPaise: 299000,
     monthlyPrice: 299,
     yearlyPrice: 2990,
     downloadsPerMonth: 50,
@@ -40,6 +44,8 @@ export const MOCK_PRICING_PLANS: PricingPlan[] = [
   {
     id: "plan-agency",
     name: "Agency",
+    monthlyPriceInPaise: 69900,
+    yearlyPriceInPaise: 699000,
     monthlyPrice: 699,
     yearlyPrice: 6990,
     downloadsPerMonth: 150,

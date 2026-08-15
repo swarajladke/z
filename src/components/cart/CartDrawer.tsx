@@ -3,20 +3,20 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { X, ShoppingBag, Trash2, ArrowRight, ShieldCheck, Tag, Sparkles } from "lucide-react";
+import { X, ShoppingBag, Trash2, ArrowRight, ShieldCheck, Tag } from "lucide-react";
 import { useCart } from "@/context/CartContext";
-import { formatCurrency } from "@/lib/utils";
+import { LicenseType } from "@/types";
+import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export const CartDrawer: React.FC = () => {
   const router = useRouter();
   const {
     cartItems,
     removeFromCart,
-    updateQuantity,
-    subtotal,
-    discountAmount,
-    taxAmount,
-    totalAmount,
+    updateItemLicense,
+    subtotalInPaise,
+    discountAmountInPaise,
+    totalAmountInPaise,
     isCartOpen,
     setIsCartOpen,
     couponCode,
@@ -72,47 +72,50 @@ export const CartDrawer: React.FC = () => {
                   className="flex gap-3 p-3 rounded-xl border border-slate-200/80 bg-white hover:border-violet-200 transition-all shadow-xs relative group"
                 >
                   <img
-                    src={item.product.thumbnailUrl}
+                    src={item.product.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
                     alt={item.product.title}
-                    className="w-16 h-16 rounded-lg object-cover bg-slate-100 border border-slate-100"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                    }}
+                    className="w-16 h-16 rounded-lg object-cover bg-slate-100 border border-slate-100 shrink-0"
                   />
                   <div className="flex-1 min-w-0">
                     <h4 className="text-xs font-bold text-slate-900 line-clamp-1">
                       {item.product.title}
                     </h4>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="text-[10px] font-semibold bg-violet-50 text-violet-700 uppercase px-1.5 py-0.5 rounded">
-                        {item.selectedLicense} License
-                      </span>
+
+                    {/* License Type Dropdown — Digital product license adjustment instead of numeric quantity controls */}
+                    <div className="mt-1.5">
+                      <label className="text-[10px] text-slate-400 font-semibold block mb-0.5">
+                        License Tier:
+                      </label>
+                      <select
+                        value={item.selectedLicense}
+                        onChange={(e) =>
+                          updateItemLicense(
+                            item.product.id,
+                            item.selectedLicense,
+                            e.target.value as LicenseType
+                          )
+                        }
+                        className="bg-violet-50 text-violet-800 border border-violet-200 text-[11px] font-bold px-2 py-1 rounded-lg focus:outline-hidden"
+                      >
+                        <option value="personal">Personal License</option>
+                        <option value="commercial">Commercial License</option>
+                        <option value="extended">Extended License</option>
+                      </select>
                     </div>
+
                     <div className="flex items-center justify-between mt-2">
-                      <div className="flex items-center gap-1 border border-slate-200 rounded-lg text-xs font-semibold px-2 py-0.5">
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product.id, item.selectedLicense, item.quantity - 1)
-                          }
-                          className="text-slate-400 hover:text-slate-700 px-1"
-                        >
-                          -
-                        </button>
-                        <span className="px-1 text-slate-800">{item.quantity}</span>
-                        <button
-                          onClick={() =>
-                            updateQuantity(item.product.id, item.selectedLicense, item.quantity + 1)
-                          }
-                          className="text-slate-400 hover:text-slate-700 px-1"
-                        >
-                          +
-                        </button>
-                      </div>
                       <span className="text-xs font-extrabold text-slate-900">
-                        {formatCurrency(item.calculatedPrice * item.quantity)}
+                        {formatPaiseToINR(item.calculatedPriceInPaise)}
                       </span>
                     </div>
                   </div>
+
                   <button
                     onClick={() => removeFromCart(item.product.id, item.selectedLicense)}
-                    className="text-slate-300 hover:text-rose-600 p-1 transition-colors"
+                    className="text-slate-300 hover:text-rose-600 p-1 transition-colors self-start"
                     aria-label="Remove item"
                   >
                     <Trash2 className="w-4 h-4" />
@@ -127,7 +130,7 @@ export const CartDrawer: React.FC = () => {
                     <div className="flex items-center gap-2 font-medium">
                       <Tag className="w-4 h-4 text-emerald-600" />
                       <span>
-                        Coupon <strong>{couponCode}</strong> applied ({discountAmount > 0 && `-${formatCurrency(discountAmount)}`})
+                        Coupon <strong>{couponCode}</strong> applied ({discountAmountInPaise > 0 && `-${formatPaiseToINR(discountAmountInPaise)}`})
                       </span>
                     </div>
                     <button
@@ -179,7 +182,7 @@ export const CartDrawer: React.FC = () => {
               <Link
                 href="/assets"
                 onClick={() => setIsCartOpen(false)}
-                className="inline-flex items-center gap-1.5 bg-violet-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-violet-800 transition-colors shadow-sm"
+                className="inline-flex items-center gap-1.5 bg-violet-700 text-white text-xs font-bold px-4 py-2.5 rounded-xl hover:bg-violet-800 transition-colors shadow-xs"
               >
                 Browse Assets <ArrowRight className="w-3.5 h-3.5" />
               </Link>
@@ -187,27 +190,28 @@ export const CartDrawer: React.FC = () => {
           )}
         </div>
 
-        {/* Footer Summary & Checkout Button */}
+        {/* Summary Footer */}
         {cartItems.length > 0 && (
           <div className="p-5 border-t border-slate-200 bg-slate-50/50 space-y-3">
             <div className="space-y-1.5 text-xs text-slate-600">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span className="font-semibold text-slate-800">{formatCurrency(subtotal)}</span>
+                <span className="font-semibold text-slate-800">{formatPaiseToINR(subtotalInPaise)}</span>
               </div>
-              {discountAmount > 0 && (
+              {discountAmountInPaise > 0 && (
                 <div className="flex justify-between text-emerald-600 font-semibold">
                   <span>Discount</span>
-                  <span>-{formatCurrency(discountAmount)}</span>
+                  <span>-{formatPaiseToINR(discountAmountInPaise)}</span>
                 </div>
               )}
-              <div className="flex justify-between text-slate-500">
-                <span>Estimated GST (18%)</span>
-                <span>{formatCurrency(taxAmount)}</span>
+              {/* Removed hardcoded GST tax */}
+              <div className="flex justify-between text-slate-400 italic">
+                <span>Taxes</span>
+                <span>Calculated at checkout</span>
               </div>
               <div className="flex justify-between pt-2 border-t border-slate-200 text-sm font-bold text-slate-900">
-                <span>Total</span>
-                <span className="text-violet-700">{formatCurrency(totalAmount)}</span>
+                <span>Total Amount</span>
+                <span className="text-violet-700">{formatPaiseToINR(totalAmountInPaise)}</span>
               </div>
             </div>
 
