@@ -17,7 +17,6 @@ import {
   Zap,
   Maximize2,
   X,
-  Eye,
 } from "lucide-react";
 import { Header } from "@/components/layout/Header";
 import { ProductCard } from "@/components/product/ProductCard";
@@ -68,7 +67,7 @@ export default function ProductDetailPage() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [allImages.length]);
+  });
 
   const relatedProducts = MOCK_PRODUCTS.filter(
     (p) => p.id !== product.id && (p.category === product.category || p.assetType === product.assetType)
@@ -84,11 +83,11 @@ export default function ProductDetailPage() {
   };
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#F5F2EC]">
       <Header onOpenSearch={() => setIsSearchOpen(true)} />
 
       {/* Breadcrumb Navigation */}
-      <div className="bg-white border-b border-slate-200 py-3">
+      <div className="bg-[#FCFAF6] border-b border-[rgba(23,23,23,0.12)] py-3">
         <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center gap-2 text-xs text-slate-500">
           <Link href="/" className="hover:text-slate-900">Home</Link>
           <ChevronRight className="w-3.5 h-3.5 text-slate-400" />
@@ -173,34 +172,34 @@ export default function ProductDetailPage() {
             </div>
 
             {/* Software & File Specs Grid */}
-            <div className="bg-white p-6 rounded-2xl border border-slate-200 space-y-4 shadow-xs">
+            <div className="bg-white p-6 rounded-2xl border border-[rgba(23,23,23,0.12)] space-y-4 shadow-2xs">
               <h3 className="font-extrabold text-slate-900 text-sm uppercase tracking-wider">
                 Technical Specifications
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-xs">
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="text-slate-400 font-semibold flex items-center gap-1 mb-1">
+                <div className="p-3 bg-[#F5F2EC] rounded-xl border border-[rgba(23,23,23,0.08)]">
+                  <div className="text-slate-500 font-semibold flex items-center gap-1 mb-1">
                     <FileCheck className="w-3.5 h-3.5 text-violet-600" /> Formats
                   </div>
                   <div className="font-bold text-slate-900">{product.fileFormats.join(", ")}</div>
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="text-slate-400 font-semibold flex items-center gap-1 mb-1">
+                <div className="p-3 bg-[#F5F2EC] rounded-xl border border-[rgba(23,23,23,0.08)]">
+                  <div className="text-slate-500 font-semibold flex items-center gap-1 mb-1">
                     <Monitor className="w-3.5 h-3.5 text-cyan-600" /> Software
                   </div>
                   <div className="font-bold text-slate-900">{product.softwareCompatibility.join(", ")}</div>
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="text-slate-400 font-semibold flex items-center gap-1 mb-1">
+                <div className="p-3 bg-[#F5F2EC] rounded-xl border border-[rgba(23,23,23,0.08)]">
+                  <div className="text-slate-500 font-semibold flex items-center gap-1 mb-1">
                     <HardDrive className="w-3.5 h-3.5 text-emerald-600" /> File Size
                   </div>
                   <div className="font-bold text-slate-900">{product.fileSize || "45 MB"}</div>
                 </div>
 
-                <div className="p-3 bg-slate-50 rounded-xl border border-slate-100">
-                  <div className="text-slate-400 font-semibold flex items-center gap-1 mb-1">
+                <div className="p-3 bg-[#F5F2EC] rounded-xl border border-[rgba(23,23,23,0.08)]">
+                  <div className="text-slate-500 font-semibold flex items-center gap-1 mb-1">
                     <Clock className="w-3.5 h-3.5 text-amber-600" /> Last Updated
                   </div>
                   <div className="font-bold text-slate-900">{product.lastUpdated}</div>
@@ -211,7 +210,7 @@ export default function ProductDetailPage() {
 
           {/* Right Column: Sticky Purchase Panel on Desktop */}
           <div className="lg:col-span-5 lg:sticky lg:top-24 space-y-6">
-            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-slate-200/90 shadow-xl space-y-6">
+            <div className="bg-white p-6 sm:p-8 rounded-3xl border border-[rgba(23,23,23,0.12)] shadow-xl space-y-6">
               {/* Category & Badge */}
               <div className="flex items-center justify-between gap-2">
                 <span className="text-xs font-bold uppercase tracking-wider text-violet-700 bg-violet-50 px-3 py-1 rounded-full border border-violet-200">
@@ -334,13 +333,13 @@ export default function ProductDetailPage() {
         </div>
 
         {/* Product Description */}
-        <div className="bg-white p-8 rounded-3xl border border-slate-200 space-y-6">
+        <div className="bg-white p-8 rounded-3xl border border-[rgba(23,23,23,0.12)] space-y-6">
           <h3 className="font-extrabold text-slate-900 text-xl">Product Details & Included Files</h3>
           <p className="text-slate-700 text-sm leading-relaxed">{product.description}</p>
 
           <div className="border-t pt-4 space-y-2">
             <h4 className="font-bold text-slate-900 text-sm">What&apos;s Included in this Download:</h4>
-            <div className="bg-slate-50 p-4 rounded-xl text-xs text-slate-800 font-mono border border-slate-200">
+            <div className="bg-[#F5F2EC] p-4 rounded-xl text-xs text-slate-800 font-mono border border-[rgba(23,23,23,0.08)]">
               {product.includedFilesText}
             </div>
           </div>

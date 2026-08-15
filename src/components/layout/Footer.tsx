@@ -1,216 +1,154 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
-import { Mail, Globe } from "lucide-react";
+import { Mail, Globe, ShieldCheck } from "lucide-react";
 import { BRAND_CONFIG } from "@/config/brand.config";
-import { useAuth } from "@/context/AuthContext";
 
 export const Footer: React.FC = () => {
-  const [currency, setCurrency] = useState("INR (₹)");
-  const [language, setLanguage] = useState("English (IN)");
-  const { isAdmin } = useAuth();
-
   return (
-    <footer className="bg-slate-900 text-slate-300 pt-16 pb-8 border-t border-slate-800">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Main Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-10 pb-12 border-b border-slate-800">
-          {/* Brand Column (2 cols) */}
+    <footer className="bg-[#171717] text-slate-300 pt-16 pb-12 border-t border-slate-800">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
+          
+          {/* Brand Info Column */}
           <div className="lg:col-span-2 space-y-4">
-            <Link href="/" className="flex items-center gap-2">
-              <div className="w-9 h-9 rounded-xl bg-violet-600 flex items-center justify-center text-white font-black text-xl shadow-md shadow-violet-900/50">
+            <Link href="/" className="flex items-center gap-2.5">
+              <div className="w-8 h-8 rounded-xl bg-violet-600 flex items-center justify-center text-white font-black text-lg">
                 K
               </div>
-              <span className="font-extrabold text-2xl tracking-tight text-white">
+              <span className="font-extrabold text-xl text-white tracking-tight">
                 {BRAND_CONFIG.name}
               </span>
             </Link>
-            <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-              {BRAND_CONFIG.positioning} High-resolution PSD, Canva, AI vectors, PNG elements & fonts built for fast modern creation.
+
+            <p className="text-xs text-slate-400 max-w-sm leading-relaxed font-normal">
+              {BRAND_CONFIG.positioning} Instant commercial digital file access for Indian creators and agencies.
             </p>
 
-            <div className="pt-2 flex items-center gap-3">
-              <span className="text-xs font-semibold text-slate-400">Support:</span>
-              <a
-                href={`mailto:${BRAND_CONFIG.supportEmail}`}
-                className="text-xs font-semibold text-cyan-400 hover:underline flex items-center gap-1"
-              >
-                <Mail className="w-3.5 h-3.5" />
-                {BRAND_CONFIG.supportEmail}
-              </a>
+            <div className="pt-2 flex items-center gap-3 text-xs text-slate-400">
+              <div className="flex items-center gap-1.5 bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800">
+                <Mail className="w-3.5 h-3.5 text-cyan-400" />
+                <a href="mailto:support@kalastock.in" className="hover:text-white transition-colors">
+                  support@kalastock.in
+                </a>
+              </div>
+              <div className="flex items-center gap-1 bg-slate-900 px-2.5 py-1.5 rounded-xl border border-slate-800 text-[11px] font-bold">
+                <Globe className="w-3.5 h-3.5 text-violet-400" />
+                <span>INR (₹)</span>
+              </div>
             </div>
           </div>
 
-          {/* Products Column */}
-          <div>
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4">
-              Products
+          {/* Product Categories */}
+          <div className="space-y-3">
+            <h4 className="font-extrabold text-white text-xs uppercase tracking-wider">
+              Asset Categories
             </h4>
-            <ul className="space-y-2.5 text-sm text-slate-400">
+            <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <Link href="/assets?assetType=Template" className="hover:text-cyan-400 transition-colors">
-                  Templates
+                <Link href="/assets?category=Social+Media" className="hover:text-white transition-colors">
+                  Social Media Templates
                 </Link>
               </li>
               <li>
-                <Link href="/assets?assetType=Vector" className="hover:text-cyan-400 transition-colors">
-                  Vectors
+                <Link href="/assets?category=Festival+Designs" className="hover:text-white transition-colors">
+                  Festival Designs & Rangoli
                 </Link>
               </li>
               <li>
-                <Link href="/assets?assetType=PNG" className="hover:text-cyan-400 transition-colors">
-                  PNG Assets
+                <Link href="/assets?category=Wedding" className="hover:text-white transition-colors">
+                  Indian Wedding Collection
                 </Link>
               </li>
               <li>
-                <Link href="/assets?assetType=Font" className="hover:text-cyan-400 transition-colors">
-                  Fonts
+                <Link href="/assets?assetType=Vector" className="hover:text-white transition-colors">
+                  Mandala & Vectors
                 </Link>
               </li>
               <li>
-                <Link href="/assets?assetType=Bundle" className="hover:text-cyan-400 transition-colors">
-                  Creative Bundles
+                <Link href="/assets?assetType=Presentation" className="hover:text-white transition-colors">
+                  Pitch Decks & Presentations
                 </Link>
               </li>
               <li>
                 <Link href="/assets?filter=free" className="hover:text-emerald-400 font-semibold transition-colors">
-                  Free Assets
+                  Free Asset Vault
                 </Link>
               </li>
             </ul>
           </div>
 
-          {/* Company Column */}
-          <div>
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4">
-              Company
+          {/* Supported Applications */}
+          <div className="space-y-3">
+            <h4 className="font-extrabold text-white text-xs uppercase tracking-wider">
+              Source Formats
             </h4>
-            <ul className="space-y-2.5 text-sm text-slate-400">
+            <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <Link href="/#pricing" className="hover:text-cyan-400 transition-colors">
-                  Pricing Plans
+                <Link href="/assets?format=PSD" className="hover:text-white transition-colors">
+                  Photoshop PSD Files
                 </Link>
               </li>
               <li>
-                <Link href="/#licensing" className="hover:text-cyan-400 transition-colors">
-                  Licensing Guide
+                <Link href="/assets?format=Canva" className="hover:text-white transition-colors">
+                  Canva Template Links
                 </Link>
               </li>
               <li>
-                <Link href="/assets?category=festival-designs" className="hover:text-cyan-400 transition-colors">
-                  Festival Collection
+                <Link href="/assets?format=AI" className="hover:text-white transition-colors">
+                  Adobe Illustrator AI
                 </Link>
               </li>
               <li>
-                <Link href="/login" className="hover:text-cyan-400 transition-colors">
-                  Customer Login
+                <Link href="/assets?format=SVG" className="hover:text-white transition-colors">
+                  Scalable Vector SVG
                 </Link>
               </li>
-              {/* Only render Admin UI link if user is logged in as admin */}
-              {isAdmin && (
-                <li>
-                  <Link href="/admin" className="hover:text-violet-400 font-semibold transition-colors">
-                    Admin UI
-                  </Link>
-                </li>
-              )}
-            </ul>
-          </div>
-
-          {/* Support Column */}
-          <div>
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4">
-              Support
-            </h4>
-            <ul className="space-y-2.5 text-sm text-slate-400">
               <li>
-                <a href="#help" className="hover:text-cyan-400 transition-colors">
-                  Help Centre
-                </a>
-              </li>
-              <li>
-                <a href="#download-help" className="hover:text-cyan-400 transition-colors">
-                  Download Help
-                </a>
-              </li>
-              <li>
-                <a href="#license-guide" className="hover:text-cyan-400 transition-colors">
-                  License Guide
-                </a>
-              </li>
-              <li>
-                <a href={`mailto:${BRAND_CONFIG.supportEmail}`} className="hover:text-cyan-400 transition-colors">
-                  Contact Support
-                </a>
+                <Link href="/assets?format=PNG" className="hover:text-white transition-colors">
+                  Transparent PNG Elements
+                </Link>
               </li>
             </ul>
           </div>
 
-          {/* Legal Column */}
-          <div>
-            <h4 className="font-bold text-white text-sm uppercase tracking-wider mb-4">
-              Legal
+          {/* Licensing & Trust */}
+          <div className="space-y-3">
+            <h4 className="font-extrabold text-white text-xs uppercase tracking-wider">
+              Licensing & Support
             </h4>
-            <ul className="space-y-2.5 text-sm text-slate-400">
+            <ul className="space-y-2 text-xs text-slate-400">
               <li>
-                <a href="#terms" className="hover:text-cyan-400 transition-colors">
-                  Terms of Service
-                </a>
+                <Link href="/#licensing" className="hover:text-white transition-colors">
+                  Commercial Rights Overview
+                </Link>
               </li>
               <li>
-                <a href="#privacy" className="hover:text-cyan-400 transition-colors">
-                  Privacy Policy
-                </a>
+                <Link href="/#pricing" className="hover:text-white transition-colors">
+                  Subscription Plans
+                </Link>
               </li>
               <li>
-                <a href="#refund" className="hover:text-cyan-400 transition-colors">
-                  Refund Policy
-                </a>
+                <Link href="/account" className="hover:text-white transition-colors">
+                  Customer Download Vault
+                </Link>
               </li>
               <li>
-                <a href="#download-policy" className="hover:text-cyan-400 transition-colors">
-                  Download Policy
-                </a>
-              </li>
-              <li>
-                <a href="#license-terms" className="hover:text-cyan-400 transition-colors">
-                  License Terms
+                <a href="#faq" className="hover:text-white transition-colors">
+                  Frequently Asked Questions
                 </a>
               </li>
             </ul>
           </div>
         </div>
 
-        {/* Bottom Row */}
-        <div className="pt-8 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500">
-          <div>
-            © {new Date().getFullYear()} {BRAND_CONFIG.name}. All rights reserved. Single-Seller Digital Asset Platform.
-          </div>
-
-          <div className="flex items-center gap-4">
-            <div className="flex items-center gap-1 text-slate-400">
-              <Globe className="w-3.5 h-3.5 text-cyan-400" />
-              <select
-                value={language}
-                onChange={(e) => setLanguage(e.target.value)}
-                className="bg-slate-800 text-slate-300 rounded px-2 py-1 focus:outline-hidden text-xs"
-              >
-                <option value="English (IN)">English (IN)</option>
-                <option value="Hindi">Hindi (हिंदी)</option>
-              </select>
-            </div>
-
-            <div className="flex items-center gap-1 text-slate-400">
-              <select
-                value={currency}
-                onChange={(e) => setCurrency(e.target.value)}
-                className="bg-slate-800 text-slate-300 rounded px-2 py-1 focus:outline-hidden text-xs"
-              >
-                <option value="INR (₹)">INR (₹)</option>
-                <option value="USD ($)">USD ($)</option>
-              </select>
-            </div>
+        {/* Bottom Bar */}
+        <div className="pt-8 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500 font-medium">
+          <p>© {new Date().getFullYear()} {BRAND_CONFIG.name}. All rights reserved. Made for Indian Creators.</p>
+          <div className="flex items-center gap-1.5 text-[11px]">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+            <span>Commercial Rights Guaranteed</span>
           </div>
         </div>
       </div>

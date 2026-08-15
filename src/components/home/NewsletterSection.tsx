@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import { Mail, CheckCircle2, ShieldCheck, Sparkles } from "lucide-react";
-import { BRAND_CONFIG } from "@/config/brand.config";
+import { Mail, CheckCircle2 } from "lucide-react";
 
 export const NewsletterSection: React.FC = () => {
   const [email, setEmail] = useState("");
@@ -10,57 +9,51 @@ export const NewsletterSection: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (email.trim() && email.includes("@")) {
+    if (email.trim()) {
       setIsSubscribed(true);
       setEmail("");
     }
   };
 
   return (
-    <section className="py-16 bg-gradient-to-r from-violet-900 via-slate-900 to-violet-950 text-white relative overflow-hidden">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        <div className="max-w-2xl mx-auto text-center space-y-6">
-          <div className="w-12 h-12 rounded-2xl bg-cyan-500/20 text-cyan-300 flex items-center justify-center mx-auto border border-cyan-400/30">
-            <Mail className="w-6 h-6" />
+    <section className="py-16 bg-slate-900 text-white border-b border-slate-800">
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
+        <div className="max-w-2xl mx-auto space-y-2">
+          <div className="inline-flex items-center gap-2 bg-slate-800 text-cyan-300 text-xs font-bold px-3 py-1 rounded-full border border-slate-700">
+            <Mail className="w-3.5 h-3.5" />
+            <span>Creative Insider Newsletter</span>
           </div>
-
-          <h2 className="text-3xl sm:text-4xl font-extrabold text-white tracking-tight">
-            Fresh assets, delivered occasionally.
+          <h2 className="text-2xl sm:text-3xl font-black text-white">
+            Get weekly free design assets & festival drops
           </h2>
-
-          <p className="text-slate-300 text-sm sm:text-base leading-relaxed">
-            Get new releases, free resources and seasonal collection updates directly in your inbox. No spam ever.
+          <p className="text-xs sm:text-sm text-slate-400">
+            Join 14,000+ Indian creators receiving curated PSD templates, vectors and Canva design drops every Tuesday.
           </p>
-
-          {isSubscribed ? (
-            <div className="bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 p-4 rounded-2xl flex items-center justify-center gap-2 text-sm font-semibold animate-in fade-in duration-300">
-              <CheckCircle2 className="w-5 h-5 text-emerald-400" />
-              Awesome! You&apos;ve been subscribed to KalaStock updates. Check your inbox soon!
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
-              <input
-                type="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="Enter your email address..."
-                className="flex-1 bg-slate-800/90 text-white placeholder:text-slate-400 border border-slate-700 rounded-xl px-4 py-3 text-sm focus:outline-hidden focus:border-cyan-400 font-medium"
-              />
-              <button
-                type="submit"
-                className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-xl transition-colors shadow-lg shadow-cyan-500/30 shrink-0"
-              >
-                Subscribe
-              </button>
-            </form>
-          )}
-
-          <div className="flex items-center justify-center gap-1.5 text-xs text-slate-400 pt-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>We respect your privacy. Unsubscribe anytime with 1-click.</span>
-          </div>
         </div>
+
+        {isSubscribed ? (
+          <div className="bg-emerald-950/80 border border-emerald-700 text-emerald-300 p-4 rounded-2xl max-w-md mx-auto text-xs font-bold flex items-center justify-center gap-2 animate-in fade-in">
+            <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+            <span>Thank you! You are now subscribed to weekly KalaStock drops.</span>
+          </div>
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col sm:flex-row items-center justify-center gap-2 max-w-md mx-auto">
+            <input
+              type="email"
+              required
+              placeholder="Enter your email address..."
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full bg-slate-800 border border-slate-700 rounded-xl px-4 py-3 text-xs text-white placeholder-slate-400 focus:outline-hidden focus:border-cyan-400 font-medium"
+            />
+            <button
+              type="submit"
+              className="w-full sm:w-auto bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs px-6 py-3 rounded-xl transition-all shadow-md shadow-violet-900/50 shrink-0"
+            >
+              Subscribe Free
+            </button>
+          </form>
+        )}
       </div>
     </section>
   );

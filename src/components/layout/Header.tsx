@@ -2,38 +2,40 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import {
   Search,
-  Heart,
   ShoppingBag,
+  Heart,
   User,
-  ChevronDown,
   Menu,
   X,
-  Sparkles,
+  ChevronDown,
   Layers,
+  Sparkles,
   ShieldAlert,
+  LogOut,
 } from "lucide-react";
-import { BRAND_CONFIG } from "@/config/brand.config";
-import { MegaMenu } from "./MegaMenu";
 import { useCart } from "@/context/CartContext";
 import { useWishlist } from "@/context/WishlistContext";
 import { useAuth } from "@/context/AuthContext";
+import { BRAND_CONFIG } from "@/config/brand.config";
+import { MegaMenu } from "./MegaMenu";
 
 interface HeaderProps {
   onOpenSearch: () => void;
 }
 
 export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
-  const pathname = usePathname();
+  const { totalItemCount, setIsCartOpen } = useCart();
+  const { wishlistIds } = useWishlist();
+  const { user, isAdmin, toggleAdminRole, logout } = useAuth();
+
+  const totalWishlistCount = wishlistIds.length;
+
+  const [isScrolled, setIsScrolled] = useState(false);
   const [isMegaMenuOpen, setIsMegaMenuOpen] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isScrolled, setIsScrolled] = useState(false);
-
-  const { totalItemCount, setIsCartOpen } = useCart();
-  const { wishlistCount } = useWishlist();
-  const { user, isLoggedIn, isAdmin } = useAuth();
+  const [isUserDropdownOpen, setIsUserDropdownOpen] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -43,7 +45,7 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  // Listen for Ctrl+K keyboard shortcut to open search
+  // Keyboard shortcut Ctrl+K / Cmd+K handler
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if ((e.metaKey || e.ctrlKey) && e.key === "k") {
@@ -56,240 +58,207 @@ export const Header: React.FC<HeaderProps> = ({ onOpenSearch }) => {
   }, [onOpenSearch]);
 
   const navLinks = [
-    { name: "Templates", href: "/assets?assetType=Template" },
-    { name: "Graphics", href: "/assets?category=social-media" },
-    { name: "Vectors", href: "/assets?assetType=Vector" },
-    { name: "PNG", href: "/assets?assetType=PNG" },
-    { name: "Fonts", href: "/assets?assetType=Font" },
-    { name: "Bundles", href: "/assets?assetType=Bundle" },
-    { name: "Pricing", href: "/#pricing" },
+    { label: "Explore", href: "/assets" },
+    { label: "Templates", href: "/assets?assetType=Template" },
+    { label: "Graphics", href: "/assets?category=Social+Media" },
+    { label: "Vectors", href: "/assets?assetType=Vector" },
+    { label: "PNG", href: "/assets?assetType=PNG" },
+    { label: "Fonts", href: "/assets?assetType=Font" },
+    { label: "Bundles", href: "/assets?assetType=Bundle" },
+    { label: "Pricing", href: "/#pricing" },
   ];
 
   return (
     <header
-      className={`sticky top-0 z-40 bg-white transition-all border-b ${
-        isScrolled ? "border-slate-200 shadow-xs py-3" : "border-slate-100 py-4"
+      className={`sticky top-0 z-40 w-full transition-all duration-200 border-b border-[rgba(23,23,23,0.12)] ${
+        isScrolled ? "bg-[#FCFAF6]/95 backdrop-blur-md shadow-xs" : "bg-[#FCFAF6]"
       }`}
     >
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 flex items-center justify-between gap-2 sm:gap-4">
-        {/* Left: Brand Logo & MegaMenu Trigger */}
-        <div className="flex items-center gap-4 lg:gap-6 shrink-0">
-          <Link href="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-violet-700 flex items-center justify-center text-white font-black text-xl shadow-xs shadow-violet-200 group-hover:scale-105 transition-transform">
-              K
-            </div>
-            <div className="flex flex-col">
-              <span className="font-extrabold text-lg sm:text-xl tracking-tight text-slate-900 leading-tight">
-                {BRAND_CONFIG.name}
-              </span>
-              <span className="text-[10px] text-slate-500 font-medium hidden sm:inline tracking-wider uppercase">
-                Digital Assets
-              </span>
-            </div>
-          </Link>
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 gap-4">
+          
+          {/* Left: Brand Logo & Navigation */}
+          <div className="flex items-center gap-6">
+            <Link href="/" className="flex items-center gap-2.5 group shrink-0">
+              <div className="w-8 h-8 rounded-xl bg-violet-700 flex items-center justify-center text-white font-black text-lg shadow-xs group-hover:bg-violet-800 transition-colors">
+                K
+              </div>
+              <div className="flex flex-col">
+                <span className="font-extrabold text-slate-900 text-lg leading-none tracking-tight">
+                  {BRAND_CONFIG.name}
+                </span>
+                <span className="text-[10px] text-slate-500 font-semibold tracking-wider uppercase mt-0.5 hidden sm:inline">
+                  {BRAND_CONFIG.tagline}
+                </span>
+              </div>
+            </Link>
 
-          {/* Desktop Navigation Links */}
-          <nav className="hidden lg:flex items-center gap-1 ml-2 relative">
+            {/* Desktop Navigation Links */}
+            <nav className="hidden lg:flex items-center gap-1 text-xs font-bold text-slate-700">
+              <div
+                className="relative"
+                onMouseEnter={() => setIsMegaMenuOpen(true)}
+                onMouseLeave={() => setIsMegaMenuOpen(false)}
+              >
+                <button className="flex items-center gap-1 px-3 py-2 rounded-lg hover:text-violet-700 hover:bg-slate-100/60 transition-colors">
+                  <span>Categories</span>
+                  <ChevronDown className="w-3.5 h-3.5" />
+                </button>
+
+                {isMegaMenuOpen && <MegaMenu onClose={() => setIsMegaMenuOpen(false)} />}
+              </div>
+
+              {navLinks.map((link) => (
+                <Link
+                  key={link.label}
+                  href={link.href}
+                  className="px-3 py-2 rounded-lg hover:text-violet-700 hover:bg-slate-100/60 transition-colors"
+                >
+                  {link.label}
+                </Link>
+              ))}
+            </nav>
+          </div>
+
+          {/* Right: Search, Wishlist, Cart & Profile */}
+          <div className="flex items-center gap-3">
+            {/* Search Trigger with Ctrl+K shortcut indicator */}
             <button
-              onClick={() => setIsMegaMenuOpen(!isMegaMenuOpen)}
-              onMouseEnter={() => setIsMegaMenuOpen(true)}
-              className={`flex items-center gap-1 px-3 py-2 text-sm font-semibold rounded-lg transition-colors ${
-                isMegaMenuOpen
-                  ? "bg-violet-50 text-violet-700"
-                  : "text-slate-700 hover:text-violet-700 hover:bg-slate-50"
-              }`}
+              onClick={onOpenSearch}
+              className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200/80 text-slate-600 px-3 py-2 rounded-xl text-xs font-semibold border border-[rgba(23,23,23,0.08)] transition-colors"
+              aria-label="Search templates"
             >
-              <Sparkles className="w-4 h-4 text-violet-600" />
-              Explore
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${
-                  isMegaMenuOpen ? "rotate-180 text-violet-600" : "text-slate-400"
-                }`}
-              />
+              <Search className="w-4 h-4 text-slate-500" />
+              <span className="hidden sm:inline">Search...</span>
+              <kbd className="hidden md:inline-block text-[10px] font-mono bg-white text-slate-400 px-1.5 py-0.5 rounded border border-slate-200 shadow-2xs">
+                ⌘K
+              </kbd>
             </button>
 
-            {navLinks.map((link) => (
-              <Link
-                key={link.name}
-                href={link.href}
-                className={`px-3 py-2 text-sm font-medium rounded-lg transition-colors ${
-                  pathname === link.href
-                    ? "text-violet-700 font-semibold bg-violet-50/50"
-                    : "text-slate-700 hover:text-violet-700 hover:bg-slate-50"
-                }`}
+            {/* Wishlist Link */}
+            <Link
+              href="/account?tab=wishlist"
+              className="relative p-2 text-slate-700 hover:text-rose-600 hover:bg-slate-100/60 rounded-xl transition-colors"
+              aria-label="Saved Wishlist"
+            >
+              <Heart className="w-5 h-5" />
+              {totalWishlistCount > 0 && (
+                <span className="absolute top-1 right-1 bg-rose-500 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center">
+                  {totalWishlistCount}
+                </span>
+              )}
+            </Link>
+
+            {/* Shopping Cart Button */}
+            <button
+              onClick={() => setIsCartOpen(true)}
+              className="relative p-2 text-slate-700 hover:text-violet-700 hover:bg-slate-100/60 rounded-xl transition-colors"
+              aria-label="Shopping Cart"
+            >
+              <ShoppingBag className="w-5 h-5" />
+              {totalItemCount > 0 && (
+                <span className="absolute top-1 right-1 bg-violet-700 text-white text-[10px] font-extrabold w-4 h-4 rounded-full flex items-center justify-center shadow-xs">
+                  {totalItemCount}
+                </span>
+              )}
+            </button>
+
+            {/* Customer Profile / Dropdown */}
+            <div className="relative">
+              <button
+                onClick={() => setIsUserDropdownOpen(!isUserDropdownOpen)}
+                className="flex items-center gap-1.5 p-1.5 rounded-xl hover:bg-slate-100/60 transition-colors border border-transparent hover:border-slate-200"
               >
-                {link.name}
-              </Link>
-            ))}
-          </nav>
-        </div>
+                <div className="w-7 h-7 rounded-lg bg-slate-900 text-white flex items-center justify-center text-xs font-extrabold">
+                  {user?.name?.[0] || "U"}
+                </div>
+                <ChevronDown className="w-3.5 h-3.5 text-slate-500 hidden sm:inline" />
+              </button>
 
-        {/* Right Actions */}
-        <div className="flex items-center gap-1.5 sm:gap-3 shrink-0">
-          {/* Quick Search Button */}
-          <button
-            onClick={onOpenSearch}
-            className="flex items-center gap-2 bg-slate-100 hover:bg-slate-200/80 text-slate-600 px-3 py-2 rounded-xl text-xs sm:text-sm font-medium transition-colors border border-slate-200/60"
-            aria-label="Search templates and assets"
-          >
-            <Search className="w-4 h-4 text-slate-500" />
-            <span className="hidden md:inline text-slate-500">Search assets...</span>
-            <kbd className="hidden lg:inline-flex items-center gap-0.5 text-[10px] font-semibold bg-white text-slate-400 border border-slate-200 px-1.5 py-0.5 rounded shadow-2xs ml-2">
-              Ctrl K
-            </kbd>
-          </button>
+              {/* Dropdown Menu */}
+              {isUserDropdownOpen && (
+                <div className="absolute right-0 mt-2 w-56 bg-white rounded-2xl border border-[rgba(23,23,23,0.12)] shadow-xl py-2 text-xs font-semibold text-slate-700 z-50 animate-in fade-in duration-150">
+                  <div className="px-4 py-2 border-b border-slate-100">
+                    <p className="font-extrabold text-slate-900">{user?.name || "Demo Creator"}</p>
+                    <p className="text-[11px] text-slate-400 font-normal truncate">{user?.email}</p>
+                  </div>
 
-          {/* Wishlist Icon */}
-          <Link
-            href="/account?tab=wishlist"
-            className="relative p-2 text-slate-700 hover:text-violet-700 hover:bg-slate-50 rounded-xl transition-colors"
-            aria-label="Wishlist"
-          >
-            <Heart className="w-5 h-5" />
-            {wishlistCount > 0 && (
-              <span className="absolute top-1 right-1 w-4 h-4 rounded-full bg-violet-600 text-white text-[10px] font-bold flex items-center justify-center">
-                {wishlistCount}
-              </span>
-            )}
-          </Link>
+                  <Link
+                    href="/account"
+                    onClick={() => setIsUserDropdownOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 hover:text-violet-700"
+                  >
+                    <User className="w-4 h-4" /> My Account Vault
+                  </Link>
 
-          {/* Cart Icon */}
-          <button
-            onClick={() => setIsCartOpen(true)}
-            className="relative p-2 text-slate-700 hover:text-violet-700 hover:bg-slate-50 rounded-xl transition-colors"
-            aria-label="Shopping Cart"
-          >
-            <ShoppingBag className="w-5 h-5" />
-            {totalItemCount > 0 && (
-              <span className="absolute top-1 right-1 w-4.5 h-4.5 rounded-full bg-cyan-500 text-slate-950 text-[10px] font-extrabold flex items-center justify-center shadow-xs">
-                {totalItemCount}
-              </span>
-            )}
-          </button>
+                  <Link
+                    href="/account?tab=downloads"
+                    onClick={() => setIsUserDropdownOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 hover:bg-slate-50 hover:text-violet-700"
+                  >
+                    <Layers className="w-4 h-4" /> My Downloads
+                  </Link>
 
-          {/* Account Button & Scoped Admin Navigation */}
-          {isLoggedIn ? (
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
-              <Link
-                href="/account"
-                className="flex items-center gap-2 bg-slate-900 hover:bg-slate-800 text-white px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors"
-              >
-                <User className="w-4 h-4 text-cyan-400" />
-                <span className="hidden sm:inline">{user?.name.split(" ")[0]}</span>
-              </Link>
+                  {/* Single Admin Link Scoped ONLY inside User Menu for Admin Role */}
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      onClick={() => setIsUserDropdownOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 bg-violet-50 text-violet-700 font-extrabold hover:bg-violet-100"
+                    >
+                      <ShieldAlert className="w-4 h-4 text-violet-700" /> Admin Dashboard
+                    </Link>
+                  )}
 
-              {/* Render Admin UI link ONLY if user has admin role */}
-              {isAdmin && (
-                <Link
-                  href="/admin"
-                  className="hidden xl:inline-flex text-xs font-semibold text-violet-700 bg-violet-50 hover:bg-violet-100 border border-violet-200 px-2.5 py-2 rounded-xl transition-colors items-center gap-1"
-                >
-                  <ShieldAlert className="w-3.5 h-3.5" /> Admin UI
-                </Link>
+                  <div className="border-t border-slate-100 pt-1 mt-1">
+                    <button
+                      onClick={toggleAdminRole}
+                      className="w-full text-left px-4 py-1.5 text-[11px] text-slate-500 hover:text-slate-900 flex items-center gap-1.5"
+                    >
+                      <Sparkles className="w-3.5 h-3.5 text-cyan-600" />
+                      Role: <strong>{isAdmin ? "Admin" : "Customer"}</strong> (Toggle)
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setIsUserDropdownOpen(false);
+                        logout();
+                      }}
+                      className="w-full text-left px-4 py-2 text-rose-600 hover:bg-rose-50 flex items-center gap-2"
+                    >
+                      <LogOut className="w-4 h-4" /> Sign Out
+                    </button>
+                  </div>
+                </div>
               )}
             </div>
-          ) : (
-            <Link
-              href="/login"
-              className="bg-violet-700 hover:bg-violet-800 text-white px-3.5 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-colors shadow-xs shadow-violet-200"
-            >
-              Sign In
-            </Link>
-          )}
 
-          {/* Mobile Menu Toggle */}
-          <button
-            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-xl transition-colors"
-            aria-label="Toggle Navigation Drawer"
-          >
-            {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
-          </button>
+            {/* Mobile Navigation Toggle */}
+            <button
+              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+              className="lg:hidden p-2 text-slate-700 hover:bg-slate-100 rounded-xl"
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Desktop Mega Menu Dropdown */}
-      {isMegaMenuOpen && (
-        <div onMouseLeave={() => setIsMegaMenuOpen(false)}>
-          <MegaMenu onClose={() => setIsMegaMenuOpen(false)} />
-        </div>
-      )}
-
-      {/* Mobile Slide-Out Drawer */}
+      {/* Mobile Drawer Navigation */}
       {isMobileMenuOpen && (
-        <div className="lg:hidden fixed inset-x-0 top-[65px] bottom-0 bg-slate-950/60 backdrop-blur-xs z-50 flex flex-col justify-between animate-in fade-in duration-200">
-          <div className="bg-white p-6 max-h-[85vh] overflow-y-auto space-y-6 shadow-2xl">
-            <div className="flex items-center justify-between border-b pb-4">
-              <span className="font-bold text-slate-900 text-sm">Explore Categories</span>
-              <button
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="p-1 text-slate-400 hover:text-slate-600"
-              >
-                <X className="w-5 h-5" />
-              </button>
-            </div>
-
-            <div className="space-y-2">
+        <div className="lg:hidden border-t border-[rgba(23,23,23,0.12)] bg-[#FCFAF6] px-4 py-4 space-y-3 animate-in slide-in-from-top duration-200">
+          <div className="space-y-1">
+            {navLinks.map((link) => (
               <Link
-                href="/assets"
+                key={link.label}
+                href={link.href}
                 onClick={() => setIsMobileMenuOpen(false)}
-                className="flex items-center gap-3 p-3 rounded-xl bg-violet-50 text-violet-700 font-semibold text-sm"
+                className="block px-3 py-2 rounded-xl text-xs font-bold text-slate-800 hover:bg-slate-100"
               >
-                <Layers className="w-5 h-5" />
-                Browse All Assets
+                {link.label}
               </Link>
-              {navLinks.map((link) => (
-                <Link
-                  key={link.name}
-                  href={link.href}
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="block p-3 rounded-xl hover:bg-slate-50 font-medium text-slate-700 text-sm border border-slate-100"
-                >
-                  {link.name}
-                </Link>
-              ))}
-            </div>
-
-            <div className="border-t pt-4 space-y-2">
-              <span className="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">
-                Popular Collections
-              </span>
-              <Link
-                href="/assets?category=festival-designs"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block p-2 text-sm text-slate-600 hover:text-violet-700"
-              >
-                🎉 Indian Festival Packs
-              </Link>
-              <Link
-                href="/assets?category=wedding"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block p-2 text-sm text-slate-600 hover:text-violet-700"
-              >
-                💍 Royal Wedding Invitations
-              </Link>
-              <Link
-                href="/assets?assetType=Bundle"
-                onClick={() => setIsMobileMenuOpen(false)}
-                className="block p-2 text-sm text-slate-600 hover:text-violet-700"
-              >
-                📦 Mega Creative Bundles
-              </Link>
-            </div>
-
-            {/* Mobile Admin Link — Only for Admin Users */}
-            {isAdmin && (
-              <div className="border-t pt-4 space-y-2">
-                <Link
-                  href="/admin"
-                  onClick={() => setIsMobileMenuOpen(false)}
-                  className="flex items-center gap-2 p-3 rounded-xl bg-slate-900 text-white text-sm font-semibold"
-                >
-                  <ShieldAlert className="w-4 h-4 text-cyan-400" />
-                  Admin UI Dashboard
-                </Link>
-              </div>
-            )}
+            ))}
           </div>
         </div>
       )}

@@ -3,50 +3,78 @@
 import React, { useState } from "react";
 import { Header } from "@/components/layout/Header";
 import { Hero } from "@/components/home/Hero";
+import { OpenIntro } from "@/components/home/OpenIntro";
 import { CategoryShortcuts } from "@/components/home/CategoryShortcuts";
 import { ExploreAssets } from "@/components/home/ExploreAssets";
 import { FeaturedBundle } from "@/components/home/FeaturedBundle";
+import { BentoDiscovery } from "@/components/home/BentoDiscovery";
 import { CuratedCollections } from "@/components/home/CuratedCollections";
 import { FreeAssetsCarousel } from "@/components/home/FreeAssetsCarousel";
-import { LicensingInfo } from "@/components/home/LicensingInfo";
+import { AssetWorkflow } from "@/components/home/AssetWorkflow";
+import { MadeWithKalaStock } from "@/components/home/MadeWithKalaStock";
+import { PlatformBenefits } from "@/components/home/PlatformBenefits";
+import { CreativeLibrary } from "@/components/home/CreativeLibrary";
 import { PricingSection } from "@/components/home/PricingSection";
-import { NewsletterSection } from "@/components/home/NewsletterSection";
+import { LicensingInfo } from "@/components/home/LicensingInfo";
+import { FAQAccordion } from "@/components/home/FAQAccordion";
+import { ClosingBanner } from "@/components/home/ClosingBanner";
 import { SearchBarModal } from "@/components/catalog/SearchBarModal";
 
 export default function HomePage() {
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   return (
-    <div className="min-h-screen flex flex-col bg-[#F8FAFC]">
+    <div className="min-h-screen flex flex-col bg-[#F5F2EC]">
       <Header onOpenSearch={() => setIsSearchOpen(true)} />
 
       <main className="flex-1">
-        {/* Hero Section */}
+        {/* 1. Cinematic Seasonal Hero */}
         <Hero />
 
-        {/* Category Shortcuts */}
+        {/* 2. Open Editorial Introduction */}
+        <OpenIntro />
+
+        {/* 3. Category Carousel */}
         <CategoryShortcuts />
 
-        {/* Explore Featured Assets */}
+        {/* 4. Explore Assets */}
         <ExploreAssets />
 
-        {/* Editorial Featured Mega-Pack Bundle */}
+        {/* 5. Featured Campaign Bundle */}
         <FeaturedBundle />
 
-        {/* Curated Collections Collage */}
+        {/* 6. Editorial Bento Discovery */}
+        <BentoDiscovery />
+
+        {/* 7. Curated Use-Case Collections */}
         <CuratedCollections />
 
-        {/* Free Assets Strip */}
+        {/* 8. Free Assets Strip */}
         <FreeAssetsCarousel />
 
-        {/* Licensing & Assurance */}
-        <LicensingInfo />
+        {/* 9. Asset-to-Campaign Workflow */}
+        <AssetWorkflow />
 
-        {/* Pricing Comparison */}
+        {/* 10. Made with KalaStock Showcase */}
+        <MadeWithKalaStock />
+
+        {/* 11. Platform Benefits */}
+        <PlatformBenefits />
+
+        {/* 12. Dark Creative-Library Section */}
+        <CreativeLibrary />
+
+        {/* 13. Pricing Comparison */}
         <PricingSection />
 
-        {/* Newsletter Community */}
-        <NewsletterSection />
+        {/* 14. Licensing & Assurance */}
+        <LicensingInfo />
+
+        {/* 15. FAQ Accordion */}
+        <FAQAccordion />
+
+        {/* 16. Closing Campaign Banner */}
+        <ClosingBanner />
       </main>
 
       <SearchBarModal isOpen={isSearchOpen} onClose={() => setIsSearchOpen(false)} />

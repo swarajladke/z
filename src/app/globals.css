@@ -4,12 +4,25 @@
   :root {
     --font-manrope: 'Manrope', system-ui, sans-serif;
     --font-inter: 'Inter', system-ui, sans-serif;
+    --bg-main: #F5F2EC;
+    --bg-elevated: #FCFAF6;
+    --bg-surface: #FFFFFF;
+    --text-main: #171717;
+    --text-muted: #6F6A63;
+    --brand-violet: #6D28D9;
+    --brand-violet-hover: #5B21B6;
+    --brand-cyan: #06B6D4;
+    --color-free: #10B981;
+    --color-error: #EF4444;
+    --border-neutral: rgba(23, 23, 23, 0.12);
+    --dark-section: #171717;
+    --dark-navy: #0F172A;
   }
 
   body {
     font-family: var(--font-inter);
-    color: #0F172A;
-    background-color: #F8FAFC;
+    color: var(--text-main);
+    background-color: var(--bg-main);
     overflow-x: hidden;
   }
 
@@ -21,7 +34,7 @@
 
 /* Texture Pattern Utilities */
 .bg-dot-pattern {
-  background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+  background-image: radial-gradient(rgba(23, 23, 23, 0.08) 1px, transparent 1px);
   background-size: 20px 20px;
 }
 

@@ -1,61 +1,65 @@
 "use client";
 
 import React from "react";
-import { Sparkles, Layers, ShieldCheck, Zap } from "lucide-react";
+import { Sparkles, Layers, ShieldCheck, Download } from "lucide-react";
 
 export const PlatformBenefits: React.FC = () => {
   const benefits = [
     {
       icon: Sparkles,
-      title: "Original creative assets",
-      desc: "Designed and sold directly by KalaStock. No generic stolen web templates.",
-      color: "text-violet-600 bg-violet-50 border-violet-200",
+      title: "Original Creative Assets",
+      desc: "Thoughtfully designed for Indian festivals, regional brands, celebrations and everyday marketing campaigns.",
     },
     {
       icon: Layers,
-      title: "Fully editable files",
-      desc: "Download organized, production-ready source files in PSD, Canva, AI, EPS & SVG.",
-      color: "text-cyan-600 bg-cyan-50 border-cyan-200",
+      title: "Fully Editable Source Files",
+      desc: "Includes layered Photoshop PSDs, Figma UI components, vectors, transparent PNGs and Canva editable links.",
     },
     {
       icon: ShieldCheck,
-      title: "Clear commercial licenses",
-      desc: "Understand exactly where and how every asset can be used for your client work.",
-      color: "text-emerald-600 bg-emerald-50 border-emerald-200",
+      title: "Clear Commercial Licenses",
+      desc: "Use assets freely in client agency graphics, Instagram ads, broadcast videos, menus and print packaging.",
     },
     {
-      icon: Zap,
-      title: "Instant access",
-      desc: "Access purchased files anytime from your secure customer download library.",
-      color: "text-amber-600 bg-amber-50 border-amber-200",
+      icon: Download,
+      title: "Instant Account Access",
+      desc: "Files are instantly unlocked in your personal digital vault after checkout. No delays, no waiting.",
     },
   ];
 
   return (
-    <section className="py-16 bg-white border-b border-slate-200">
+    <section className="py-20 bg-[#F5F2EC] border-b border-[rgba(23,23,23,0.12)] text-[#171717]">
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="text-center max-w-2xl mx-auto mb-12">
-          <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-            Why Indian creators choose KalaStock
-          </h2>
-          <p className="text-slate-500 text-xs sm:text-sm mt-2">
-            Built from the ground up to solve real design and agency workflows in India.
-          </p>
-        </div>
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          
+          {/* Left 1 Introduction Column */}
+          <div className="lg:col-span-5 space-y-4">
+            <span className="text-xs font-extrabold uppercase tracking-widest text-[#6D28D9]">
+              Why Choose KalaStock
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black tracking-tight leading-tight">
+              Designed for creators who value quality and speed.
+            </h2>
+            <p className="text-sm text-[#6F6A63] leading-relaxed">
+              We eliminate template chaos with curated source files ready to edit and publish immediately.
+            </p>
+          </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {benefits.map((item) => (
-            <div
-              key={item.title}
-              className="bg-slate-50/70 p-6 rounded-2xl border border-slate-200/80 hover:bg-white hover:shadow-lg transition-all duration-300"
-            >
-              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-4 border ${item.color}`}>
-                <item.icon className="w-6 h-6" />
+          {/* Right 4 Open Benefit Items with Thin Dividers */}
+          <div className="lg:col-span-7 divide-y divide-[rgba(23,23,23,0.12)]">
+            {benefits.map((item, idx) => (
+              <div key={idx} className="py-6 first:pt-0 last:pb-0 flex items-start gap-4">
+                <div className="w-10 h-10 rounded-2xl bg-white border border-[rgba(23,23,23,0.12)] text-[#6D28D9] flex items-center justify-center font-extrabold shrink-0 shadow-2xs">
+                  <item.icon className="w-5 h-5" />
+                </div>
+                <div className="space-y-1">
+                  <h3 className="font-extrabold text-base text-[#171717]">{item.title}</h3>
+                  <p className="text-xs text-[#6F6A63] leading-relaxed">{item.desc}</p>
+                </div>
               </div>
-              <h3 className="font-bold text-slate-900 text-base mb-1.5">{item.title}</h3>
-              <p className="text-slate-600 text-xs leading-relaxed">{item.desc}</p>
-            </div>
-          ))}
+            ))}
+          </div>
+
         </div>
       </div>
     </section>
