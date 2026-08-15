@@ -1,0 +1,85 @@
+import { Collection } from "@/types";
+
+export const MOCK_COLLECTIONS: Collection[] = [
+  {
+    id: "col-festive",
+    slug: "festive-india",
+    title: "Festive India",
+    description: "All-in-one celebration kit containing Diwali, Independence Day, Eid & Navratri designs.",
+    assetCount: 450,
+    startingPrice: 349,
+    thumbnailUrl: "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1605810230434-7631ac76ec81?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1532375810709-75b1da00537c?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1567157577867-05ccb1388e66?auto=format&fit=crop&w=400&q=80",
+    ],
+    isTrending: true,
+    badge: "Trending",
+  },
+  {
+    id: "col-social",
+    slug: "social-media-essentials",
+    title: "Social Media Essentials",
+    description: "High-performing Instagram post templates, story graphics, and carousel packs for creators.",
+    assetCount: 320,
+    startingPrice: 199,
+    thumbnailUrl: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?auto=format&fit=crop&w=400&q=80",
+      "https://images.unsplash.com/photo-1608889175123-8ee362201f81?auto=format&fit=crop&w=400&q=80",
+    ],
+    isTrending: true,
+    badge: "Popular",
+  },
+  {
+    id: "col-business",
+    slug: "modern-business",
+    title: "Modern Business",
+    description: "Corporate presentations, pitch decks, visiting cards, and brand identity kits.",
+    assetCount: 210,
+    startingPrice: 299,
+    thumbnailUrl: "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1557804506-669a67965ba0?auto=format&fit=crop&w=400&q=80",
+    ],
+  },
+  {
+    id: "col-wedding",
+    slug: "wedding-season",
+    title: "Wedding Season",
+    description: "Royal invitation suites, Haldi/Sangeet function cards, and gold foil mandala borders.",
+    assetCount: 180,
+    startingPrice: 399,
+    thumbnailUrl: "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=400&q=80",
+    ],
+    isTrending: true,
+    badge: "Seasonal",
+  },
+  {
+    id: "col-food",
+    slug: "food-restaurant-collection",
+    title: "Food & Restaurant",
+    description: "Menu templates, Zomato/Swiggy cover art, and mouth-watering social media posts.",
+    assetCount: 150,
+    startingPrice: 249,
+    thumbnailUrl: "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1555396273-367ea4eb4db5?auto=format&fit=crop&w=400&q=80",
+    ],
+  },
+  {
+    id: "col-creator",
+    slug: "creator-starter-pack",
+    title: "Creator Starter Pack",
+    description: "Must-have YouTube thumbnails, channel banners, logo templates, and reels covers.",
+    assetCount: 290,
+    startingPrice: 149,
+    thumbnailUrl: "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=800&q=80",
+    previewImages: [
+      "https://images.unsplash.com/photo-1544787219-7f47ccb76574?auto=format&fit=crop&w=400&q=80",
+    ],
+  },
+];

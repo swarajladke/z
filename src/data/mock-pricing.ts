@@ -1,0 +1,58 @@
+import { PricingPlan } from "@/types";
+
+export const MOCK_PRICING_PLANS: PricingPlan[] = [
+  {
+    id: "plan-starter",
+    name: "Starter",
+    monthlyPrice: 149,
+    yearlyPrice: 1490,
+    downloadsPerMonth: 15,
+    libraryAccess: "Standard asset library",
+    licenseIncluded: "Personal and basic commercial use",
+    features: [
+      "15 asset downloads / month",
+      "Access to standard templates & vectors",
+      "PNG elements & icons included",
+      "Personal & basic social media license",
+      "Standard download speed",
+    ],
+    buttonText: "Start Starter Plan",
+  },
+  {
+    id: "plan-creator",
+    name: "Creator",
+    monthlyPrice: 299,
+    yearlyPrice: 2990,
+    downloadsPerMonth: 50,
+    libraryAccess: "Full premium library",
+    licenseIncluded: "Full commercial license",
+    isPopular: true,
+    features: [
+      "50 asset downloads / month",
+      "Full access to premium festival kits & bundles",
+      "PSD & Canva source files",
+      "Commercial license for client work",
+      "Priority customer support",
+      "New releases 48h early access",
+    ],
+    buttonText: "Join Creator Plan",
+  },
+  {
+    id: "plan-agency",
+    name: "Agency",
+    monthlyPrice: 699,
+    yearlyPrice: 6990,
+    downloadsPerMonth: 150,
+    libraryAccess: "Full premium library + Exclusive bundles",
+    licenseIncluded: "Extended commercial license",
+    features: [
+      "150 asset downloads / month",
+      "Full premium library + mega bundles",
+      "Extended commercial & broadcast license",
+      "Up to 3 team member logins",
+      "Dedicated account manager",
+      "Custom format request privilege",
+    ],
+    buttonText: "Subscribe Agency Plan",
+  },
+];
