@@ -1,15 +1,46 @@
 @import "tailwindcss";
 
 @layer base {
-  h1, h2, h3, h4, h5, h6 {
-    font-family: var(--font-manrope), sans-serif;
+  :root {
+    --font-manrope: 'Manrope', system-ui, sans-serif;
+    --font-inter: 'Inter', system-ui, sans-serif;
   }
+
   body {
-    font-family: var(--font-inter), sans-serif;
+    font-family: var(--font-inter);
+    color: #0F172A;
+    background-color: #F8FAFC;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: var(--font-manrope);
+    letter-spacing: -0.025em;
   }
 }
 
-/* Custom scrollbar hiding utility for category horizontal scroll */
+/* Texture Pattern Utilities */
+.bg-dot-pattern {
+  background-image: radial-gradient(rgba(148, 163, 184, 0.15) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+.bg-dot-pattern-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Reduced Motion Overrides */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Custom Scrollbar for Pill Row */
 .scrollbar-none::-webkit-scrollbar {
   display: none;
 }

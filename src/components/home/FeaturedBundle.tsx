@@ -2,106 +2,146 @@
 
 import React from "react";
 import Link from "next/link";
-import { Package, ArrowRight, Eye, ShieldCheck, CheckCircle2, Sparkles } from "lucide-react";
-import { useQuickPreview } from "@/context/QuickPreviewContext";
+import { Layers, ArrowRight, Eye, CheckCircle2, ShieldCheck } from "lucide-react";
+import { motion, useReducedMotion } from "framer-motion";
 import { MOCK_PRODUCTS } from "@/data/mock-products";
+import { useQuickPreview } from "@/context/QuickPreviewContext";
+import { formatPaiseToINR, FALLBACK_IMAGE_DATA_URL } from "@/lib/utils";
 
 export const FeaturedBundle: React.FC = () => {
   const { openQuickPreview } = useQuickPreview();
-  const bundleProduct = MOCK_PRODUCTS.find((p) => p.id === "prod-9") || MOCK_PRODUCTS[0];
+  const shouldReduceMotion = useReducedMotion();
+
+  // Find the bundle product
+  const bundleProduct = MOCK_PRODUCTS.find((p) => p.isBundle) || MOCK_PRODUCTS[8];
+
+  const secondaryPreviews = MOCK_PRODUCTS.slice(0, 3);
 
   return (
-    <section className="py-16 bg-white border-y border-slate-200">
-      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="bg-gradient-to-br from-slate-900 via-violet-950 to-slate-950 rounded-3xl p-8 sm:p-12 text-white relative overflow-hidden shadow-2xl border border-slate-800">
-          {/* Background Glows */}
-          <div className="absolute top-0 right-0 w-[500px] h-[500px] bg-violet-600/20 rounded-full blur-3xl pointer-events-none" />
-          <div className="absolute bottom-0 left-0 w-[400px] h-[400px] bg-cyan-500/15 rounded-full blur-3xl pointer-events-none" />
+    <section className="py-20 bg-slate-950 text-white relative overflow-hidden border-b border-slate-800 bg-dot-pattern-dark">
+      {/* Subtle Low-Opacity Background Glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-900/10 rounded-full blur-3xl pointer-events-none" />
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center relative z-10">
-            {/* Content Column */}
-            <div className="lg:col-span-7 space-y-6">
-              <div className="inline-flex items-center gap-2 bg-cyan-500/20 text-cyan-300 px-3.5 py-1.5 rounded-full text-xs font-extrabold uppercase tracking-wider border border-cyan-400/30">
-                <Package className="w-4 h-4 text-cyan-400" />
-                Limited-Time Bundle
+      <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <motion.div
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+          className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden"
+        >
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+            {/* Left Copy Column */}
+            <div className="lg:col-span-6 space-y-6">
+              <div className="inline-flex items-center gap-2 bg-violet-900/40 text-violet-300 text-xs font-extrabold px-3.5 py-1.5 rounded-full border border-violet-700/50">
+                <Layers className="w-3.5 h-3.5 text-cyan-400" />
+                <span>Editorial Mega-Pack Collection</span>
               </div>
 
-              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-extrabold text-white tracking-tight leading-tight">
+              <h2 className="text-3xl sm:text-4xl lg:text-5xl font-black text-white leading-tight tracking-tight">
                 Indian Festival Design Mega Pack
               </h2>
 
-              <p className="text-slate-300 text-base sm:text-lg max-w-xl leading-relaxed">
-                Get editable social posts, banners, vectors and transparent PNG elements for 15+ Indian festivals in one complete, production-ready collection.
+              <p className="text-slate-300 text-sm sm:text-base leading-relaxed font-normal">
+                {bundleProduct.description}
               </p>
 
               {/* Feature Points */}
-              <div className="grid grid-cols-2 gap-3 pt-2">
-                {[
-                  "250+ Source Files Included",
-                  "PSD, Canva, AI, EPS & PNG",
-                  "Commercial-use License Included",
-                  "Free Lifetime Content Updates",
-                ].map((feat) => (
-                  <div key={feat} className="flex items-center gap-2 text-xs sm:text-sm text-slate-200 font-medium">
-                    <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
-                    <span>{feat}</span>
-                  </div>
-                ))}
+              <div className="grid grid-cols-2 gap-3 text-xs text-slate-300 pt-2 font-medium">
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>250+ Editable PSD & Canva Files</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-cyan-400 shrink-0" />
+                  <span>Diwali, Holi, Independence Day</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <ShieldCheck className="w-4 h-4 text-violet-400 shrink-0" />
+                  <span>Commercial Agency Rights</span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Lifetime Cloud Updates</span>
+                </div>
               </div>
 
-              {/* Price & Action Row */}
-              <div className="pt-4 flex flex-wrap items-center gap-6">
+              {/* Price & Action Buttons */}
+              <div className="pt-4 flex flex-col sm:flex-row sm:items-center gap-4 border-t border-slate-800">
                 <div className="flex items-baseline gap-2">
-                  <span className="text-3xl sm:text-4xl font-black text-cyan-400">₹799</span>
-                  <span className="text-slate-400 text-base sm:text-lg line-through font-semibold">₹1,499</span>
-                  <span className="bg-emerald-500/20 text-emerald-300 text-xs font-bold px-2.5 py-1 rounded-full border border-emerald-400/30">
-                    SAVE 47%
+                  <span className="text-3xl font-black text-white">
+                    {formatPaiseToINR(bundleProduct.priceInPaise || 79900)}
                   </span>
+                  {bundleProduct.originalPriceInPaise && (
+                    <span className="text-slate-500 line-through text-sm font-semibold">
+                      {formatPaiseToINR(bundleProduct.originalPriceInPaise)}
+                    </span>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-3">
                   <Link
                     href={`/product/${bundleProduct.slug}`}
-                    className="bg-cyan-500 hover:bg-cyan-400 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-xl transition-colors shadow-lg shadow-cyan-500/30 flex items-center gap-2"
+                    className="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-violet-900/50 flex items-center gap-2"
                   >
-                    Explore Bundle <ArrowRight className="w-4 h-4" />
+                    <span>Get Mega Pack</span>
+                    <ArrowRight className="w-4 h-4" />
                   </Link>
-
                   <button
                     onClick={() => openQuickPreview(bundleProduct)}
-                    className="bg-white/10 hover:bg-white/20 text-white font-semibold text-sm px-4 py-3 rounded-xl transition-colors flex items-center gap-2 border border-white/20"
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs px-4 py-3.5 rounded-xl transition-colors flex items-center gap-1.5 border border-slate-700"
                   >
                     <Eye className="w-4 h-4 text-cyan-400" />
-                    Preview Contents
+                    <span>Quick View</span>
                   </button>
                 </div>
               </div>
             </div>
 
-            {/* Visual Collage Column */}
-            <div className="lg:col-span-5">
-              <div className="relative aspect-4/3 rounded-2xl overflow-hidden border-2 border-white/20 shadow-2xl group">
-                <img
-                  src="https://images.unsplash.com/photo-1607604276583-eef5d076aa5f?auto=format&fit=crop&w=800&q=80"
-                  alt="Indian Festival Mega Pack Preview"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
-                />
+            {/* Right Overlapping Layered Preview Artwork */}
+            <div className="lg:col-span-6 relative flex justify-center items-center">
+              <div className="relative w-full aspect-[4/3] max-w-lg">
+                {/* Secondary overlapping background cards */}
+                <div className="absolute top-4 -right-4 w-3/4 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl opacity-70 rotate-6">
+                  <img
+                    src={secondaryPreviews[1]?.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
+                    alt="Bundle item preview"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
 
-                <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent p-6 flex flex-col justify-end">
-                  <div className="bg-slate-900/90 backdrop-blur-md p-4 rounded-xl border border-slate-700/80 text-xs space-y-1">
-                    <div className="font-bold text-white flex items-center justify-between">
-                      <span>Includes Festivals:</span>
-                      <span className="text-cyan-400">15 Festivals</span>
-                    </div>
-                    <p className="text-slate-300 text-[11px]">
-                      Independence Day, Diwali, Rakhi, Holi, Navratri, Eid, Ganesh Chaturthi & more.
-                    </p>
+                <div className="absolute -top-4 -left-4 w-3/4 aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border border-slate-800 shadow-2xl opacity-70 -rotate-6">
+                  <img
+                    src={secondaryPreviews[2]?.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
+                    alt="Bundle item preview"
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+
+                {/* Primary Bundle Artwork Card */}
+                <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden bg-slate-950 border border-slate-700 shadow-2xl group transition-transform duration-300 hover:scale-[1.02]">
+                  <img
+                    src={bundleProduct.thumbnailUrl || FALLBACK_IMAGE_DATA_URL}
+                    alt={bundleProduct.title}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).src = FALLBACK_IMAGE_DATA_URL;
+                    }}
+                    className="w-full h-full object-cover"
+                  />
+                  <div className="absolute top-3 left-3 bg-cyan-600 text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-md shadow-md tracking-wider">
+                    250+ FILES BUNDLE
                   </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
+        </motion.div>
       </div>
     </section>
   );
