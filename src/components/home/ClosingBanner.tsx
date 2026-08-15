@@ -41,14 +41,14 @@ export const ClosingBanner: React.FC = () => {
         <div className="pt-4 flex flex-col sm:flex-row items-center justify-center gap-4">
           <Link
             href="/assets"
-            className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white font-bold text-xs px-8 py-4 rounded-xl transition-all shadow-lg shadow-violet-900/50 flex items-center gap-2"
+            className="bg-[#6D28D9] hover:bg-[#5B21B6] text-white font-bold text-xs px-8 py-4 rounded-xl transition-all shadow-lg shadow-violet-900/50 flex items-center gap-2 hover:-translate-y-[1px] group"
           >
-            <span>Explore Assets</span>
-            <ArrowRight className="w-4 h-4" />
+            <span>Explore Asset Catalog</span>
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-[3px] transition-transform" />
           </Link>
           <Link
             href="/assets?filter=free"
-            className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs px-6 py-4 rounded-xl transition-colors flex items-center gap-2"
+            className="bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white border border-slate-700 font-bold text-xs px-6 py-4 rounded-xl transition-colors flex items-center gap-2 hover:-translate-y-[1px]"
           >
             <Download className="w-4 h-4 text-emerald-400" />
             <span>View Free Downloads</span>

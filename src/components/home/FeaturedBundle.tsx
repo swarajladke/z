@@ -24,10 +24,10 @@ export const FeaturedBundle: React.FC = () => {
 
       <div className="max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <motion.div
-          initial={shouldReduceMotion ? false : { opacity: 0, y: 20 }}
+          initial={shouldReduceMotion ? false : { opacity: 0, y: 16 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true }}
-          transition={{ duration: 0.5 }}
+          transition={{ duration: 0.4 }}
           className="bg-slate-900/90 border border-slate-800 rounded-3xl p-8 sm:p-12 shadow-2xl relative overflow-hidden"
         >
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -82,14 +82,14 @@ export const FeaturedBundle: React.FC = () => {
                 <div className="flex items-center gap-3">
                   <Link
                     href={`/product/${bundleProduct.slug}`}
-                    className="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-violet-900/50 flex items-center gap-2"
+                    className="bg-violet-600 hover:bg-violet-500 text-white font-bold text-xs px-6 py-3.5 rounded-xl transition-all shadow-lg shadow-violet-900/50 flex items-center gap-2 hover:-translate-y-[1px] group"
                   >
                     <span>Get Mega Pack</span>
-                    <ArrowRight className="w-4 h-4" />
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-[3px] transition-transform" />
                   </Link>
                   <button
                     onClick={() => openQuickPreview(bundleProduct)}
-                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs px-4 py-3.5 rounded-xl transition-colors flex items-center gap-1.5 border border-slate-700"
+                    className="bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white font-bold text-xs px-4 py-3.5 rounded-xl transition-colors flex items-center gap-1.5 border border-slate-700 hover:-translate-y-[1px]"
                   >
                     <Eye className="w-4 h-4 text-cyan-400" />
                     <span>Quick View</span>
@@ -134,7 +134,7 @@ export const FeaturedBundle: React.FC = () => {
                     }}
                     className="w-full h-full object-cover"
                   />
-                  <div className="absolute top-3 left-3 bg-cyan-600 text-white text-[10px] font-extrabold uppercase px-3 py-1 rounded-md shadow-md tracking-wider">
+                  <div className="absolute top-3 left-3 bg-cyan-600 text-white text-xs font-extrabold uppercase px-3 py-1 rounded-md shadow-md tracking-wider">
                     250+ FILES BUNDLE
                   </div>
                 </div>

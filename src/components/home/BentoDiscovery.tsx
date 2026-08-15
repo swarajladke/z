@@ -29,7 +29,7 @@ export const BentoDiscovery: React.FC = () => {
           {/* Large Item 1: Everything for your next campaign */}
           <div className="md:col-span-8 bg-[#171717] text-white rounded-3xl p-8 border border-slate-800 shadow-xl flex flex-col justify-between relative overflow-hidden group">
             <div className="space-y-3 z-10 max-w-md">
-              <span className="bg-[#6D28D9] text-white text-[10px] font-extrabold uppercase px-2.5 py-1 rounded-md tracking-wider">
+              <span className="bg-[#6D28D9] text-white text-xs font-extrabold uppercase px-3 py-1 rounded-md tracking-wider">
                 FEATURED WORKFLOW
               </span>
               <h3 className="text-2xl sm:text-3xl font-black text-white leading-tight">
@@ -52,10 +52,10 @@ export const BentoDiscovery: React.FC = () => {
             </div>
 
             <div className="mt-6 flex items-center justify-between z-10 pt-4 border-t border-slate-800">
-              <span className="text-xs text-slate-400 font-semibold">15 PSDs + Canva Editable Links</span>
+              <span className="text-xs text-slate-300 font-semibold">15 PSDs + Canva Editable Links</span>
               <Link
                 href="/assets"
-                className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1"
+                className="text-xs font-bold text-cyan-400 hover:text-cyan-300 flex items-center gap-1 hover:-translate-y-[1px]"
               >
                 Explore Campaign Kits →
               </Link>
@@ -65,7 +65,7 @@ export const BentoDiscovery: React.FC = () => {
           {/* Medium Item 2: Festival-ready design packs */}
           <div className="md:col-span-4 bg-white rounded-3xl p-6 border border-[rgba(23,23,23,0.12)] shadow-xs flex flex-col justify-between group">
             <div className="space-y-2">
-              <span className="text-[10px] font-extrabold text-[#6D28D9] uppercase tracking-wider block">
+              <span className="text-xs font-extrabold text-[#6D28D9] uppercase tracking-wider block">
                 FESTIVAL SPECIALS
               </span>
               <h3 className="text-xl font-bold text-[#171717]">Festival-ready design packs</h3>
@@ -93,7 +93,7 @@ export const BentoDiscovery: React.FC = () => {
           {/* Medium Item 3: One template, every format */}
           <div className="md:col-span-4 bg-[#0F172A] text-white rounded-3xl p-6 border border-slate-800 shadow-lg flex flex-col justify-between">
             <div className="space-y-2">
-              <span className="text-[10px] font-extrabold text-cyan-400 uppercase tracking-wider block">
+              <span className="text-xs font-extrabold text-cyan-400 uppercase tracking-wider block">
                 MULTI-FORMAT ACCESS
               </span>
               <h3 className="text-xl font-bold text-white">One template, every format</h3>
